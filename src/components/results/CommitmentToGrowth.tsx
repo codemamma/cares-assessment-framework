@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import { assessmentCategories } from "@/data/caresQuestions";
 import { CommitmentData, CareCategoryKey } from "@/types/assessment";
 import { saveCommitmentData, loadCommitmentData } from "@/lib/storage";
+import { saveCommitment } from "@/lib/api";
 
-export function CommitmentToGrowth() {
+interface Props {
+  assessmentId: string | null;
+}
+
+export function CommitmentToGrowth({ assessmentId }: Props) {
   const [data, setData] = useState<CommitmentData>({
     focusArea: "",
     practice: "",
@@ -11,6 +16,7 @@ export function CommitmentToGrowth() {
     support: "",
   });
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setData(loadCommitmentData());
@@ -22,8 +28,21 @@ export function CommitmentToGrowth() {
     setSaved(false);
   }
 
-  function handleSave() {
+  async function handleSave() {
+    setSaving(true);
     saveCommitmentData(data);
+
+    if (assessmentId) {
+      await saveCommitment({
+        assessmentId,
+        focus_area: data.focusArea,
+        practice: data.practice,
+        measure: data.measure,
+        support: data.support,
+      });
+    }
+
+    setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   }
@@ -52,7 +71,7 @@ export function CommitmentToGrowth() {
                 onChange={(e) =>
                   handleChange("focusArea", e.target.value as CareCategoryKey | "")
                 }
-                className="w-full bg-slate-700 border border-slate-600 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                className="w-full bg-slate-700 border border-slate-600 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Select a capability...</option>
                 {assessmentCategories.map((cat) => (
@@ -72,7 +91,7 @@ export function CommitmentToGrowth() {
                 onChange={(e) => handleChange("practice", e.target.value)}
                 placeholder="Describe one specific behavior or habit you'll work on..."
                 rows={3}
-                className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
+                className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               />
             </div>
 
@@ -85,7 +104,7 @@ export function CommitmentToGrowth() {
                 onChange={(e) => handleChange("measure", e.target.value)}
                 placeholder="What signals or feedback will tell you you're improving?..."
                 rows={3}
-                className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
+                className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               />
             </div>
 
@@ -98,16 +117,17 @@ export function CommitmentToGrowth() {
                 onChange={(e) => handleChange("support", e.target.value)}
                 placeholder="Name a mentor, peer, coach, or colleague who can help hold you accountable..."
                 rows={2}
-                className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
+                className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               />
             </div>
 
             <div className="flex items-center justify-between pt-2">
               <button
                 onClick={handleSave}
-                className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 text-sm"
+                disabled={saving}
+                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 disabled:opacity-60 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 text-sm"
               >
-                Save Commitment
+                {saving ? "Saving..." : "Save Commitment"}
               </button>
               {saved && (
                 <span className="text-green-400 text-sm font-medium animate-fade-in">

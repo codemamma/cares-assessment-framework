@@ -19,6 +19,7 @@ export default function ResultsPage() {
   const navigate = useNavigate()
   const [results, setResults] = useState<AssessmentResults | null>(null)
   const [email, setEmail] = useState<string | null>(null)
+  const [assessmentId, setAssessmentId] = useState<string | null>(null)
 
   useEffect(() => {
     const responses = loadAssessmentResponses()
@@ -46,7 +47,7 @@ export default function ResultsPage() {
       const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
       const recommendedChapters = recs?.chapters.slice(0, 3) ?? []
 
-      await submitAssessment({
+      const id = await submitAssessment({
         email: submittedEmail,
         overall_score: results.normalizedScore,
         raw_score: results.rawScore,
@@ -57,6 +58,7 @@ export default function ResultsPage() {
         recommended_chapters: recommendedChapters,
         categoryScores: results.categoryScores,
       })
+      if (id) setAssessmentId(id)
     }
   }
 
@@ -152,7 +154,7 @@ export default function ResultsPage() {
         <>
           <div className="border-t border-slate-800/60 bg-[#07111f] py-12 px-4">
             <div className="max-w-3xl mx-auto">
-              <CommitmentToGrowth />
+              <CommitmentToGrowth assessmentId={assessmentId} />
             </div>
           </div>
 
