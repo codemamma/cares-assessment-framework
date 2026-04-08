@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from 'react-router-dom'
 
 export default function LandingPage() {
   return (
@@ -41,7 +41,7 @@ export default function LandingPage() {
 
           <div className="flex justify-center mb-20">
             <Link
-              href="/assessment"
+              to="/assessment"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all duration-200 shadow-xl shadow-purple-900/40 hover:shadow-purple-900/60 hover:scale-105"
             >
               Start Assessment
@@ -94,7 +94,7 @@ export default function LandingPage() {
           ].map((item) => (
             <div
               key={item.title}
-              className={`rounded-2xl p-6 border bg-slate-900/60 border-slate-800 flex gap-4 items-start`}
+              className="rounded-2xl p-6 border bg-slate-900/60 border-slate-800 flex gap-4 items-start"
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border ${item.bg}`}
@@ -141,7 +141,7 @@ export default function LandingPage() {
             No signup required. Your responses stay on your device.
           </p>
           <Link
-            href="/assessment"
+            to="/assessment"
             className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all duration-200 shadow-xl shadow-purple-900/40 hover:scale-105"
           >
             Begin Your Assessment
@@ -150,5 +150,5 @@ export default function LandingPage() {
         </div>
       </div>
     </main>
-  );
+  )
 }

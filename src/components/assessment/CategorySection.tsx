@@ -1,5 +1,3 @@
-"use client";
-
 import { AssessmentCategory } from "@/types/assessment";
 import { AssessmentResponses } from "@/types/assessment";
 import { QuestionRatingRow } from "./QuestionRatingRow";

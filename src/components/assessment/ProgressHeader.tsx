@@ -1,5 +1,3 @@
-"use client";
-
 interface ProgressHeaderProps {
   currentStep: number;
   totalSteps: number;

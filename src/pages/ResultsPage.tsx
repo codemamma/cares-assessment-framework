@@ -1,51 +1,46 @@
-"use client";
+import { useEffect, useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { loadAssessmentResponses, clearAssessmentResponses } from '@/lib/storage'
+import { calculateResults, generateMockResponses } from '@/lib/scoring'
+import { AssessmentResults } from '@/types/assessment'
+import { ScoreHero } from '@/components/results/ScoreHero'
+import { CategoryBreakdown } from '@/components/results/CategoryBreakdown'
+import { InsightCard } from '@/components/results/InsightCard'
+import { RecommendationCard } from '@/components/results/RecommendationCard'
+import { CommitmentToGrowth } from '@/components/results/CommitmentToGrowth'
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { loadAssessmentResponses, clearAssessmentResponses } from "@/lib/storage";
-import { calculateResults, generateMockResponses } from "@/lib/scoring";
-import { AssessmentResults } from "@/types/assessment";
-import { ScoreHero } from "@/components/results/ScoreHero";
-import { CategoryBreakdown } from "@/components/results/CategoryBreakdown";
-import { InsightCard } from "@/components/results/InsightCard";
-import { RecommendationCard } from "@/components/results/RecommendationCard";
-import { CommitmentToGrowth } from "@/components/results/CommitmentToGrowth";
-
-const DEV_MOCK = process.env.NODE_ENV === "development";
+const DEV_MOCK = import.meta.env.DEV
 
 export default function ResultsPage() {
-  const router = useRouter();
-  const [results, setResults] = useState<AssessmentResults | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const navigate = useNavigate()
+  const [results, setResults] = useState<AssessmentResults | null>(null)
 
   useEffect(() => {
-    const responses = loadAssessmentResponses();
-    const hasResponses = Object.keys(responses).length === 25;
+    const responses = loadAssessmentResponses()
+    const hasResponses = Object.keys(responses).length === 25
 
     if (!hasResponses && DEV_MOCK) {
-      const mockResponses = generateMockResponses();
-      setResults(calculateResults(mockResponses));
+      const mockResponses = generateMockResponses()
+      setResults(calculateResults(mockResponses))
     } else if (!hasResponses) {
-      router.push("/assessment");
-      return;
+      navigate('/assessment')
+      return
     } else {
-      setResults(calculateResults(responses));
+      setResults(calculateResults(responses))
     }
-    setMounted(true);
-  }, [router]);
+  }, [navigate])
 
   function handleRetake() {
-    clearAssessmentResponses();
-    router.push("/assessment");
+    clearAssessmentResponses()
+    navigate('/assessment')
   }
 
-  if (!mounted || !results) {
+  if (!results) {
     return (
       <div className="min-h-screen bg-[#07111f] flex items-center justify-center">
         <div className="text-slate-400 text-lg">Calculating your results...</div>
       </div>
-    );
+    )
   }
 
   return (
@@ -108,7 +103,7 @@ export default function ResultsPage() {
               Retake Assessment
             </button>
             <Link
-              href="/"
+              to="/"
               className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-semibold px-6 py-3 rounded-xl transition-all text-sm"
             >
               Back to Home
@@ -117,5 +112,5 @@ export default function ResultsPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

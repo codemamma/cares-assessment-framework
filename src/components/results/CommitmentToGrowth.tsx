@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { assessmentCategories } from "@/data/caresQuestions";
 import { CommitmentData, CareCategoryKey } from "@/types/assessment";
