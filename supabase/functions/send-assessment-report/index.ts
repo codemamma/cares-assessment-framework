@@ -1,5 +1,5 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { Resend } from "npm:resend@3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -299,18 +299,30 @@ Deno.serve(async (req: Request) => {
       commitment: commitment ?? null,
     });
 
-    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendApiKey) {
+      console.error("RESEND_API_KEY not configured");
+      return json({ error: "Email service not configured" }, 500);
+    }
 
-    const { error: sendError } = await resend.emails.send({
-      from: "Saby CARES <noreply@sabycares.com>",
-      to: assessment.email,
-      subject: "Your CARES Leadership Report",
-      html: emailHtml,
+    const emailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "CARES Assessment <onboarding@resend.dev>",
+        to: [assessment.email],
+        subject: "Your CARES Leadership Report",
+        html: emailHtml,
+      }),
     });
 
-    if (sendError) {
-      console.error("Resend error:", sendError);
-      return json({ error: "Failed to send email", detail: sendError }, 500);
+    if (!emailResponse.ok) {
+      const errorData = await emailResponse.json();
+      console.error("Resend error:", errorData);
+      return json({ error: "Failed to send email", detail: errorData }, 500);
     }
 
     await supabase
