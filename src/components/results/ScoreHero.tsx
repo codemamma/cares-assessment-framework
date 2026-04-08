@@ -1,12 +1,11 @@
 import { AssessmentResults } from "@/types/assessment";
-import { Badge } from "@/components/shared/Badge";
 
 interface ScoreHeroProps {
   results: AssessmentResults;
 }
 
 export function ScoreHero({ results }: ScoreHeroProps) {
-  const { normalizedScore, scoreBand, rawScore } = results;
+  const { normalizedScore, scoreBand } = results;
 
   const bandColor =
     normalizedScore >= 80
@@ -17,39 +16,40 @@ export function ScoreHero({ results }: ScoreHeroProps) {
       ? "text-yellow-400"
       : "text-red-400";
 
+  const bandBg =
+    normalizedScore >= 80
+      ? "bg-green-500/10 border-green-500/30"
+      : normalizedScore >= 60
+      ? "bg-blue-500/10 border-blue-500/30"
+      : normalizedScore >= 40
+      ? "bg-yellow-500/10 border-yellow-500/30"
+      : "bg-red-500/10 border-red-500/30";
+
   return (
-    <div className="bg-[#07111f] text-white py-16 px-4">
-      <div className="max-w-3xl mx-auto text-center">
-        <Badge variant="purple" className="mb-6">
+    <div className="bg-[#07111f] text-white pt-12 pb-8 px-4 border-b border-slate-800/60">
+      <div className="max-w-3xl mx-auto">
+        <p className="text-xs font-semibold text-purple-400 uppercase tracking-widest mb-3">
           Assessment Complete
-        </Badge>
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">
+        </p>
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-6">
           Your CARES Leadership Profile
         </h1>
-        <p className="text-slate-400 mb-10 text-lg">
-          Based on your responses across all 5 dimensions
-        </p>
 
-        <div className="flex flex-col items-center mb-10">
-          <div className="relative flex items-center justify-center w-44 h-44 rounded-full border-4 border-yellow-400/30 bg-yellow-400/5 mb-4">
-            <div className="text-center">
-              <span className={`text-6xl font-black ${bandColor}`}>
-                {normalizedScore}
-              </span>
-              <span className="text-slate-400 text-2xl font-bold">/100</span>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className={`flex items-center gap-3 rounded-2xl px-5 py-3 border flex-shrink-0 ${bandBg}`}>
+            <span className={`text-4xl font-black leading-none ${bandColor}`}>
+              {normalizedScore}
+            </span>
+            <div>
+              <p className="text-slate-500 text-xs">out of 100</p>
+              <p className={`text-sm font-semibold ${bandColor}`}>
+                {scoreBand.label}
+              </p>
             </div>
           </div>
-          <p className="text-xs text-slate-500 mb-2">Raw score: {rawScore} / 125</p>
-          <span
-            className={`text-xl font-bold ${bandColor}`}
-          >
-            {scoreBand.title}
-          </span>
-        </div>
 
-        <div className="max-w-2xl mx-auto bg-white/5 border border-white/10 rounded-2xl p-6 text-left">
-          <p className="text-slate-200 leading-relaxed text-base">
-            {scoreBand.interpretation}
+          <p className="text-slate-400 text-sm leading-relaxed max-w-lg">
+            {scoreBand.summary}
           </p>
         </div>
       </div>

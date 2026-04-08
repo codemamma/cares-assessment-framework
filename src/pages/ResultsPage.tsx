@@ -1,34 +1,43 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { loadAssessmentResponses, clearAssessmentResponses } from '@/lib/storage'
+import { loadAssessmentResponses, clearAssessmentResponses, saveEmailCapture } from '@/lib/storage'
 import { calculateResults, generateMockResponses } from '@/lib/scoring'
 import { AssessmentResults } from '@/types/assessment'
 import { ScoreHero } from '@/components/results/ScoreHero'
 import { CategoryBreakdown } from '@/components/results/CategoryBreakdown'
 import { InsightCard } from '@/components/results/InsightCard'
-import { RecommendationCard } from '@/components/results/RecommendationCard'
+import { EmailGate } from '@/components/results/EmailGate'
+import { RoadmapSteps, SuggestedReading } from '@/components/results/RecommendationCard'
 import { CommitmentToGrowth } from '@/components/results/CommitmentToGrowth'
+import { CTASection } from '@/components/results/CTASection'
 
 const DEV_MOCK = import.meta.env.DEV
 
 export default function ResultsPage() {
   const navigate = useNavigate()
   const [results, setResults] = useState<AssessmentResults | null>(null)
+  const [email, setEmail] = useState<string | null>(null)
 
   useEffect(() => {
     const responses = loadAssessmentResponses()
     const hasResponses = Object.keys(responses).length === 25
 
     if (!hasResponses && DEV_MOCK) {
-      const mockResponses = generateMockResponses()
-      setResults(calculateResults(mockResponses))
+      setResults(calculateResults(generateMockResponses()))
     } else if (!hasResponses) {
       navigate('/assessment')
-      return
     } else {
       setResults(calculateResults(responses))
     }
   }, [navigate])
+
+  function handleEmailUnlock(submittedEmail: string) {
+    setEmail(submittedEmail)
+    saveEmailCapture({ firstName: '', email: submittedEmail, role: '', company: '' })
+    setTimeout(() => {
+      document.getElementById('roadmap-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+  }
 
   function handleRetake() {
     clearAssessmentResponses()
@@ -48,13 +57,15 @@ export default function ResultsPage() {
       <ScoreHero results={results} />
       <CategoryBreakdown categoryScores={results.categoryScores} />
 
-      <div className="bg-[#07111f] py-12 px-4">
+      <div className="border-t border-slate-800/60 bg-[#07111f] py-12 px-4">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-white mb-2">Key Insights</h2>
-          <p className="text-slate-400 mb-6">
-            Your leadership profile highlights these key findings
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+            Key Insights
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <h2 className="text-xl font-bold text-white mb-6">
+            What your results reveal
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             <InsightCard
               type="strength"
               categoryLabel={results.highestCategory.label}
@@ -70,41 +81,89 @@ export default function ResultsPage() {
               percentage={results.lowestCategory.percentage}
             />
           </div>
-        </div>
-      </div>
 
-      <div className="bg-slate-900/50 py-12 px-4">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-white mb-2">
-            Development Roadmap
-          </h2>
-          <p className="text-slate-400 mb-8">
-            Targeted guidance based on your lowest-scoring dimension
-          </p>
-          <RecommendationCard lowestCategory={results.lowestCategory.key} />
-        </div>
-      </div>
-
-      <CommitmentToGrowth />
-
-      <div className="bg-[#07111f] py-12 px-4 border-t border-slate-800">
-        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <p className="text-white font-semibold">Ready to go deeper?</p>
-            <p className="text-slate-400 text-sm">
-              Retake the assessment after 30 days to measure your growth.
+          <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
+            <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2">
+              Focus Insight
+            </p>
+            <p className="text-white text-base leading-relaxed">
+              Your biggest growth lever is{' '}
+              <span className="font-semibold text-amber-300">
+                {results.lowestCategory.label}
+              </span>
+              . This is the capability that will unlock your leadership effectiveness.
             </p>
           </div>
+        </div>
+      </div>
+
+      <div className="border-t border-slate-800/60 bg-slate-900/30 py-12 px-4">
+        <div className="max-w-3xl mx-auto">
+          {!email ? (
+            <EmailGate onUnlock={handleEmailUnlock} />
+          ) : (
+            <div id="roadmap-section" className="space-y-12">
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  Development Roadmap
+                </p>
+                <h2 className="text-xl font-bold text-white mb-6">
+                  Your next three moves
+                </h2>
+                <RoadmapSteps lowestCategory={results.lowestCategory.key} />
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  Suggested Reading
+                </p>
+                <h2 className="text-xl font-bold text-white mb-6">
+                  Go deeper
+                </h2>
+                <SuggestedReading lowestCategory={results.lowestCategory.key} />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {email && (
+        <>
+          <div className="border-t border-slate-800/60 bg-[#07111f] py-12 px-4">
+            <div className="max-w-3xl mx-auto">
+              <CommitmentToGrowth />
+            </div>
+          </div>
+
+          <div className="border-t border-slate-800/60 bg-slate-900/30 py-12 px-4">
+            <div className="max-w-3xl mx-auto">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                Next Steps
+              </p>
+              <h2 className="text-xl font-bold text-white mb-6">
+                Take action on your results
+              </h2>
+              <CTASection results={results} email={email} />
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="border-t border-slate-800 bg-[#07111f] py-8 px-4">
+        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-slate-500 text-sm">
+            Retake after 30 days to measure your growth.
+          </p>
           <div className="flex gap-3">
             <button
               onClick={handleRetake}
-              className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all text-sm"
+              className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white font-medium px-5 py-2.5 rounded-xl transition-all text-sm"
             >
               Retake Assessment
             </button>
             <Link
               to="/"
-              className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-semibold px-6 py-3 rounded-xl transition-all text-sm"
+              className="text-slate-500 hover:text-slate-300 font-medium px-5 py-2.5 rounded-xl transition-all text-sm"
             >
               Back to Home
             </Link>
