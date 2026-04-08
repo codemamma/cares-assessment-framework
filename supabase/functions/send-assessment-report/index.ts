@@ -248,56 +248,125 @@ Deno.serve(async (req: Request) => {
     );
 
     const body = await req.json();
-    const { assessmentId } = body as { assessmentId: string };
 
-    if (!assessmentId) {
-      return json({ error: "assessmentId is required" }, 400);
+    let assessmentId: string | null = body.assessmentId ?? null;
+    let assessmentEmail: string | null = null;
+    let emailHtmlData: Parameters<typeof buildEmailHtml>[0] | null = null;
+
+    if (assessmentId) {
+      const { data: assessment, error: assessmentErr } = await supabase
+        .from("assessments")
+        .select("*")
+        .eq("id", assessmentId)
+        .maybeSingle();
+
+      if (assessmentErr || !assessment) {
+        return json({ error: "Assessment not found" }, 404);
+      }
+
+      if (!assessment.email) {
+        return json({ error: "No email address on assessment" }, 400);
+      }
+
+      const { data: categoryScores } = await supabase
+        .from("assessment_category_scores")
+        .select("*")
+        .eq("assessment_id", assessmentId);
+
+      const { data: commitment } = await supabase
+        .from("assessment_commitments")
+        .select("*")
+        .eq("assessment_id", assessmentId)
+        .maybeSingle();
+
+      assessmentEmail = assessment.email;
+      emailHtmlData = {
+        email: assessment.email,
+        overall_score: assessment.overall_score,
+        score_band: assessment.score_band,
+        categoryScores: categoryScores ?? [],
+        lowest_dimension: assessment.lowest_dimension,
+        strongest_dimension: assessment.strongest_dimension,
+        roadmap_steps: Array.isArray(assessment.roadmap_steps) ? assessment.roadmap_steps : [],
+        recommended_chapters: Array.isArray(assessment.recommended_chapters) ? assessment.recommended_chapters : [],
+        commitment: commitment ?? null,
+      };
+    } else {
+      const {
+        email,
+        overall_score,
+        raw_score,
+        score_band,
+        lowest_dimension,
+        strongest_dimension,
+        roadmap_steps,
+        recommended_chapters,
+        categoryScores: incomingScores,
+      } = body;
+
+      if (!email || !email.includes("@")) {
+        return json({ error: "Valid email is required" }, 400);
+      }
+
+      const { data: newAssessment, error: insertError } = await supabase
+        .from("assessments")
+        .insert({
+          email,
+          overall_score: overall_score ?? 0,
+          raw_score: raw_score ?? 0,
+          score_band: score_band ?? "",
+          lowest_dimension: lowest_dimension ?? "",
+          strongest_dimension: strongest_dimension ?? "",
+          roadmap_steps: roadmap_steps ?? [],
+          recommended_chapters: recommended_chapters ?? [],
+          report_sent: false,
+        })
+        .select()
+        .single();
+
+      if (insertError || !newAssessment) {
+        console.error("Insert error:", insertError);
+        return json({ error: "Failed to save assessment" }, 500);
+      }
+
+      assessmentId = newAssessment.id;
+
+      if (Array.isArray(incomingScores) && incomingScores.length > 0) {
+        await supabase.from("assessment_category_scores").insert(
+          incomingScores.map((s: { category_key: string; label: string; raw: number; max: number; percentage: number }) => ({
+            assessment_id: assessmentId,
+            category_key: s.category_key,
+            label: s.label,
+            raw: s.raw,
+            max: s.max,
+            percentage: s.percentage,
+          }))
+        );
+      }
+
+      assessmentEmail = email;
+      emailHtmlData = {
+        email,
+        overall_score: overall_score ?? 0,
+        score_band: score_band ?? "",
+        categoryScores: Array.isArray(incomingScores)
+          ? incomingScores.map((s: { category_key: string; label: string; raw: number; max: number; percentage: number }) => ({
+              category_key: s.category_key,
+              label: s.label,
+              raw: s.raw,
+              max: s.max,
+              percentage: s.percentage,
+            }))
+          : [],
+        lowest_dimension: lowest_dimension ?? "",
+        strongest_dimension: strongest_dimension ?? "",
+        roadmap_steps: Array.isArray(roadmap_steps) ? roadmap_steps : [],
+        recommended_chapters: Array.isArray(recommended_chapters) ? recommended_chapters : [],
+        commitment: null,
+      };
     }
 
-    const { data: assessment, error: assessmentErr } = await supabase
-      .from("assessments")
-      .select("*")
-      .eq("id", assessmentId)
-      .maybeSingle();
-
-    if (assessmentErr || !assessment) {
-      return json({ error: "Assessment not found" }, 404);
-    }
-
-    if (!assessment.email) {
-      return json({ error: "No email address on assessment" }, 400);
-    }
-
-    const { data: categoryScores } = await supabase
-      .from("assessment_category_scores")
-      .select("*")
-      .eq("assessment_id", assessmentId);
-
-    const { data: commitment } = await supabase
-      .from("assessment_commitments")
-      .select("*")
-      .eq("assessment_id", assessmentId)
-      .maybeSingle();
-
-    const roadmapSteps: string[] = Array.isArray(assessment.roadmap_steps)
-      ? assessment.roadmap_steps
-      : [];
-    const recommendedChapters: { number: number; title: string; reason: string }[] =
-      Array.isArray(assessment.recommended_chapters)
-        ? assessment.recommended_chapters
-        : [];
-
-    const emailHtml = buildEmailHtml({
-      email: assessment.email,
-      overall_score: assessment.overall_score,
-      score_band: assessment.score_band,
-      categoryScores: categoryScores ?? [],
-      lowest_dimension: assessment.lowest_dimension,
-      strongest_dimension: assessment.strongest_dimension,
-      roadmap_steps: roadmapSteps,
-      recommended_chapters: recommendedChapters,
-      commitment: commitment ?? null,
-    });
+    const emailHtml = buildEmailHtml(emailHtmlData!);
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) {
@@ -313,7 +382,7 @@ Deno.serve(async (req: Request) => {
       },
       body: JSON.stringify({
         from: "CARES Assessment <onboarding@resend.dev>",
-        to: [assessment.email],
+        to: [assessmentEmail],
         subject: "Your CARES Leadership Report",
         html: emailHtml,
       }),

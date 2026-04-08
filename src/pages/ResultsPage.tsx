@@ -10,6 +10,8 @@ import { EmailGate } from '@/components/results/EmailGate'
 import { RoadmapSteps, SuggestedReading } from '@/components/results/RecommendationCard'
 import { CommitmentToGrowth } from '@/components/results/CommitmentToGrowth'
 import { CTASection } from '@/components/results/CTASection'
+import { recommendationsByCategory } from '@/data/recommendations'
+import { submitAssessment } from '@/lib/api'
 
 const DEV_MOCK = import.meta.env.DEV
 
@@ -31,12 +33,31 @@ export default function ResultsPage() {
     }
   }, [navigate])
 
-  function handleEmailUnlock(submittedEmail: string) {
+  async function handleEmailUnlock(submittedEmail: string) {
     setEmail(submittedEmail)
     saveEmailCapture({ firstName: '', email: submittedEmail, role: '', company: '' })
     setTimeout(() => {
       document.getElementById('roadmap-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 100)
+
+    if (results) {
+      const lowestKey = results.lowestCategory.key
+      const recs = recommendationsByCategory[lowestKey]
+      const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
+      const recommendedChapters = recs?.chapters.slice(0, 3) ?? []
+
+      await submitAssessment({
+        email: submittedEmail,
+        overall_score: results.normalizedScore,
+        raw_score: results.rawScore,
+        score_band: results.scoreBand.label,
+        lowest_dimension: results.lowestCategory.key,
+        strongest_dimension: results.highestCategory.key,
+        roadmap_steps: roadmapSteps,
+        recommended_chapters: recommendedChapters,
+        categoryScores: results.categoryScores,
+      })
+    }
   }
 
   function handleRetake() {
