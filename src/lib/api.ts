@@ -12,7 +12,7 @@ interface SubmitAssessmentParams {
   categoryScores: CategoryScore[];
 }
 
-export async function submitAssessment(params: SubmitAssessmentParams): Promise<void> {
+export async function submitAssessment(params: SubmitAssessmentParams): Promise<string | null> {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -35,7 +35,7 @@ export async function submitAssessment(params: SubmitAssessmentParams): Promise<
   };
 
   try {
-    await fetch(`${supabaseUrl}/functions/v1/send-assessment-report`, {
+    const res = await fetch(`${supabaseUrl}/functions/v1/send-assessment-report`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,7 +44,43 @@ export async function submitAssessment(params: SubmitAssessmentParams): Promise<
       },
       body: JSON.stringify(body),
     });
+
+    if (res.ok) {
+      const data = await res.json();
+      return data.assessmentId ?? null;
+    }
+    return null;
   } catch (err) {
     console.error("Failed to submit assessment:", err);
+    return null;
+  }
+}
+
+interface SaveCommitmentParams {
+  assessmentId: string;
+  focus_area: string;
+  practice: string;
+  measure: string;
+  support: string;
+}
+
+export async function saveCommitment(params: SaveCommitmentParams): Promise<boolean> {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  try {
+    const res = await fetch(`${supabaseUrl}/functions/v1/save-commitment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseAnonKey}`,
+        "Apikey": supabaseAnonKey,
+      },
+      body: JSON.stringify(params),
+    });
+    return res.ok;
+  } catch (err) {
+    console.error("Failed to save commitment:", err);
+    return false;
   }
 }
