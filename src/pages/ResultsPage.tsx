@@ -145,8 +145,8 @@ export default function ResultsPage() {
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
                   Suggested Reading
                 </p>
-                <h2 className="text-xl font-bold text-white mb-6">
-                  Go deeper
+                <h2 className="text-xl font-bold text-white mb-2">
+                  Recommended Reading from the CARES Framework
                 </h2>
                 <SuggestedReading lowestCategory={results.lowestCategory.key} />
               </div>
