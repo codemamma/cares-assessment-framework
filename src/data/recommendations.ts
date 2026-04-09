@@ -1,5 +1,39 @@
 import { CareCategoryKey } from "@/types/assessment";
 
+export interface ChapterEntry {
+  title: string;
+  code: string;
+}
+
+export const chapterMap: Record<CareCategoryKey, ChapterEntry> = {
+  communicate_with_empathy: {
+    title: "Communicate with Empathy",
+    code: "C",
+  },
+  adapt_with_agility: {
+    title: "Adapt with Agility",
+    code: "A",
+  },
+  relationships_built_on_trust: {
+    title: "Build Meaningful Relationships",
+    code: "R",
+  },
+  empower_with_trust: {
+    title: "Empower Teams to Excel",
+    code: "E",
+  },
+  stay_calm_through_challenges: {
+    title: "Stay Calm under Pressure",
+    code: "S",
+  },
+};
+
+export const supportingChapters = [
+  "Applying CARES to Your Organization",
+  "Building Resilience & Adaptability in Teams",
+  "CARES in Action",
+];
+
 interface Chapter {
   number: number;
   title: string;
