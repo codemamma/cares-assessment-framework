@@ -82,13 +82,17 @@ function buildEmailHtml(params: {
     .map(
       (ch) => `
       <div style="background:${ch.isPrimary ? "#0c1e35" : "#1e293b"};border:1px solid ${ch.isPrimary ? "#1d4ed844" : "#334155"};border-radius:10px;padding:14px 16px;margin-bottom:10px;">
-        <div style="display:flex;align-items:flex-start;gap:16px;">
-          <span style="background:${ch.isPrimary ? "#0ea5e920" : "#334155"};border:1px solid ${ch.isPrimary ? "#0ea5e940" : "#475569"};color:${ch.isPrimary ? "#7dd3fc" : "#94a3b8"};font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;flex-shrink:0;white-space:nowrap;">${ch.isPrimary ? "Focus Area" : "Apply &amp; Strengthen"}</span>
-          <div>
-            <p style="margin:0 0 4px;color:#f1f5f9;font-size:13px;font-weight:600;">${ch.title}</p>
-            <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.5;">${ch.isPrimary ? "This chapter directly addresses your key development area." : "Practical application to strengthen your overall CARES leadership."}</p>
-          </div>
-        </div>
+        <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="vertical-align:top;padding-right:16px;width:1%;white-space:nowrap;">
+              <span style="display:inline-block;background:${ch.isPrimary ? "#0ea5e920" : "#334155"};border:1px solid ${ch.isPrimary ? "#0ea5e940" : "#475569"};color:${ch.isPrimary ? "#7dd3fc" : "#94a3b8"};font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;">${ch.isPrimary ? "Focus Area" : "Apply &amp; Strengthen"}</span>
+            </td>
+            <td style="vertical-align:top;">
+              <p style="margin:0 0 4px;color:#f1f5f9;font-size:13px;font-weight:600;">${ch.title}</p>
+              <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.5;">${ch.isPrimary ? "This chapter directly addresses your key development area." : "Practical application to strengthen your overall CARES leadership."}</p>
+            </td>
+          </tr>
+        </table>
       </div>`
     )
     .join("");
