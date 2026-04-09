@@ -25,17 +25,37 @@ export default function ResultsPage() {
     const responses = loadAssessmentResponses()
     const hasResponses = Object.keys(responses).length === 25
 
+    let computed: AssessmentResults | null = null
+
     if (!hasResponses && DEV_MOCK) {
-      setResults(calculateResults(generateMockResponses()))
+      computed = calculateResults(generateMockResponses())
+      setResults(computed)
     } else if (!hasResponses) {
       navigate('/assessment')
+      return
     } else {
-      setResults(calculateResults(responses))
+      computed = calculateResults(responses)
+      setResults(computed)
     }
 
     const savedEmail = loadEmailCapture()
-    if (savedEmail?.email) {
+    if (savedEmail?.email && computed) {
       setEmail(savedEmail.email)
+      const lowestKey = computed.lowestCategory.key
+      const recs = recommendationsByCategory[lowestKey]
+      const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
+      const recommendedChapters = recs?.chapters.slice(0, 3) ?? []
+      submitAssessment({
+        email: savedEmail.email,
+        overall_score: computed.normalizedScore,
+        raw_score: computed.rawScore,
+        score_band: computed.scoreBand.label,
+        lowest_dimension: lowestKey,
+        strongest_dimension: computed.highestCategory.key,
+        roadmap_steps: roadmapSteps,
+        recommended_chapters: recommendedChapters,
+        categoryScores: computed.categoryScores,
+      }).then((id) => { if (id) setAssessmentId(id) })
     }
   }, [navigate])
 
