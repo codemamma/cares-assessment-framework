@@ -330,6 +330,7 @@ Deno.serve(async (req: Request) => {
             roadmap_steps: roadmap_steps ?? [],
             recommended_chapters: recommended_chapters ?? [],
             report_sent: false,
+            completed_at: new Date().toISOString(),
           })
           .eq("id", existing.id);
         newAssessment = existing;
@@ -346,6 +347,7 @@ Deno.serve(async (req: Request) => {
             roadmap_steps: roadmap_steps ?? [],
             recommended_chapters: recommended_chapters ?? [],
             report_sent: false,
+            completed_at: new Date().toISOString(),
           })
           .select("id")
           .single();
