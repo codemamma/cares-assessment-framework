@@ -38,7 +38,7 @@ function buildEmailHtml(params: {
   lowest_dimension: string;
   strongest_dimension: string;
   roadmap_steps: string[];
-  recommended_chapters: { number: number; title: string; reason: string }[];
+  recommended_chapters: { title: string; isPrimary: boolean }[];
   commitment: { focus_area: string; practice: string; measure: string; support: string } | null;
 }): string {
   const {
@@ -81,12 +81,12 @@ function buildEmailHtml(params: {
   const chapterRows = recommended_chapters
     .map(
       (ch) => `
-      <div style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+      <div style="background:${ch.isPrimary ? "#0c1e35" : "#1e293b"};border:1px solid ${ch.isPrimary ? "#1d4ed844" : "#334155"};border-radius:10px;padding:14px 16px;margin-bottom:10px;">
         <div style="display:flex;align-items:flex-start;gap:10px;">
-          <span style="background:#1e1b4b;border:1px solid #4338ca44;color:#a5b4fc;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;flex-shrink:0;margin-top:1px;">Ch. ${ch.number}</span>
+          <span style="background:${ch.isPrimary ? "#0ea5e920" : "#334155"};border:1px solid ${ch.isPrimary ? "#0ea5e940" : "#475569"};color:${ch.isPrimary ? "#7dd3fc" : "#94a3b8"};font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;flex-shrink:0;margin-top:1px;">${ch.isPrimary ? "Focus Area" : "Apply &amp; Strengthen"}</span>
           <div>
             <p style="margin:0 0 4px;color:#f1f5f9;font-size:13px;font-weight:600;">${ch.title}</p>
-            <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.5;">${ch.reason}</p>
+            <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.5;">${ch.isPrimary ? "This chapter directly addresses your key development area." : "Practical application to strengthen your overall CARES leadership."}</p>
           </div>
         </div>
       </div>`

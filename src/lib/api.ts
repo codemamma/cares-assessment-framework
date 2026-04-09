@@ -8,7 +8,7 @@ interface SubmitAssessmentParams {
   lowest_dimension: string;
   strongest_dimension: string;
   roadmap_steps: string[];
-  recommended_chapters: { number: number; title: string; reason: string }[];
+  recommended_chapters: { title: string; isPrimary: boolean }[];
   categoryScores: CategoryScore[];
 }
 

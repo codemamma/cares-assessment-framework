@@ -10,8 +10,20 @@ import { EmailGate } from '@/components/results/EmailGate'
 import { RoadmapSteps, SuggestedReading } from '@/components/results/RecommendationCard'
 import { CommitmentToGrowth } from '@/components/results/CommitmentToGrowth'
 import { CTASection } from '@/components/results/CTASection'
-import { recommendationsByCategory } from '@/data/recommendations'
+import { recommendationsByCategory, chapterMap, supportingChapters } from '@/data/recommendations'
 import { submitAssessment } from '@/lib/api'
+import { CareCategoryKey } from '@/types/assessment'
+
+function getReadingList(lowestCategory: CareCategoryKey) {
+  const primary = chapterMap[lowestCategory]
+  const always = "CARES in Action"
+  const other = supportingChapters.filter((c) => c !== always)[0]
+  return [
+    { title: primary.title, isPrimary: true },
+    { title: always, isPrimary: false },
+    { title: other, isPrimary: false },
+  ]
+}
 
 const DEV_MOCK = import.meta.env.DEV
 
@@ -25,17 +37,37 @@ export default function ResultsPage() {
     const responses = loadAssessmentResponses()
     const hasResponses = Object.keys(responses).length === 25
 
+    let computed: AssessmentResults | null = null
+
     if (!hasResponses && DEV_MOCK) {
-      setResults(calculateResults(generateMockResponses()))
+      computed = calculateResults(generateMockResponses())
+      setResults(computed)
     } else if (!hasResponses) {
       navigate('/assessment')
+      return
     } else {
-      setResults(calculateResults(responses))
+      computed = calculateResults(responses)
+      setResults(computed)
     }
 
     const savedEmail = loadEmailCapture()
-    if (savedEmail?.email) {
+    if (savedEmail?.email && computed) {
       setEmail(savedEmail.email)
+      const lowestKey = computed.lowestCategory.key
+      const recs = recommendationsByCategory[lowestKey]
+      const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
+      const recommendedChapters = getReadingList(lowestKey)
+      submitAssessment({
+        email: savedEmail.email,
+        overall_score: computed.normalizedScore,
+        raw_score: computed.rawScore,
+        score_band: computed.scoreBand.label,
+        lowest_dimension: lowestKey,
+        strongest_dimension: computed.highestCategory.key,
+        roadmap_steps: roadmapSteps,
+        recommended_chapters: recommendedChapters,
+        categoryScores: computed.categoryScores,
+      }).then((id) => { if (id) setAssessmentId(id) })
     }
   }, [navigate])
 
@@ -50,7 +82,7 @@ export default function ResultsPage() {
       const lowestKey = results.lowestCategory.key
       const recs = recommendationsByCategory[lowestKey]
       const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
-      const recommendedChapters = recs?.chapters.slice(0, 3) ?? []
+      const recommendedChapters = getReadingList(lowestKey)
 
       const id = await submitAssessment({
         email: submittedEmail,
