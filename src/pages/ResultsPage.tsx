@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { loadAssessmentResponses, clearAssessmentResponses, saveEmailCapture } from '@/lib/storage'
+import { loadAssessmentResponses, clearAssessmentResponses, saveEmailCapture, loadEmailCapture } from '@/lib/storage'
 import { calculateResults, generateMockResponses } from '@/lib/scoring'
 import { AssessmentResults } from '@/types/assessment'
 import { ScoreHero } from '@/components/results/ScoreHero'
@@ -31,6 +31,11 @@ export default function ResultsPage() {
       navigate('/assessment')
     } else {
       setResults(calculateResults(responses))
+    }
+
+    const savedEmail = loadEmailCapture()
+    if (savedEmail?.email) {
+      setEmail(savedEmail.email)
     }
   }, [navigate])
 
