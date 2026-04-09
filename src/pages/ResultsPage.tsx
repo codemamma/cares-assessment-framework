@@ -10,8 +10,20 @@ import { EmailGate } from '@/components/results/EmailGate'
 import { RoadmapSteps, SuggestedReading } from '@/components/results/RecommendationCard'
 import { CommitmentToGrowth } from '@/components/results/CommitmentToGrowth'
 import { CTASection } from '@/components/results/CTASection'
-import { recommendationsByCategory } from '@/data/recommendations'
+import { recommendationsByCategory, chapterMap, supportingChapters } from '@/data/recommendations'
 import { submitAssessment } from '@/lib/api'
+import { CareCategoryKey } from '@/types/assessment'
+
+function getReadingList(lowestCategory: CareCategoryKey) {
+  const primary = chapterMap[lowestCategory]
+  const always = "CARES in Action"
+  const other = supportingChapters.filter((c) => c !== always)[0]
+  return [
+    { title: primary.title, isPrimary: true },
+    { title: always, isPrimary: false },
+    { title: other, isPrimary: false },
+  ]
+}
 
 const DEV_MOCK = import.meta.env.DEV
 
@@ -44,7 +56,7 @@ export default function ResultsPage() {
       const lowestKey = computed.lowestCategory.key
       const recs = recommendationsByCategory[lowestKey]
       const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
-      const recommendedChapters = recs?.chapters.slice(0, 3) ?? []
+      const recommendedChapters = getReadingList(lowestKey)
       submitAssessment({
         email: savedEmail.email,
         overall_score: computed.normalizedScore,
@@ -70,7 +82,7 @@ export default function ResultsPage() {
       const lowestKey = results.lowestCategory.key
       const recs = recommendationsByCategory[lowestKey]
       const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
-      const recommendedChapters = recs?.chapters.slice(0, 3) ?? []
+      const recommendedChapters = getReadingList(lowestKey)
 
       const id = await submitAssessment({
         email: submittedEmail,
