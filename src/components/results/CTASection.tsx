@@ -1,47 +1,36 @@
 import { useState } from "react";
-import { AssessmentResults, CommitmentData } from "@/types/assessment";
-import { loadCommitmentData } from "@/lib/storage";
+import { AssessmentResults } from "@/types/assessment";
+import { trackAction } from "@/lib/api";
 
 interface CTASectionProps {
   results: AssessmentResults;
   email: string;
+  assessmentId: string | null;
 }
 
-export function CTASection({ results, email }: CTASectionProps) {
-  const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
+export function CTASection({ assessmentId }: CTASectionProps) {
+  const [strategyDone, setStrategyDone] = useState(false);
 
   async function handleStrategySession() {
-    setStatus("loading");
-
-    const commitment: CommitmentData = loadCommitmentData();
-
-    const payload = {
-      email,
-      scores: {
-        overall: results.normalizedScore,
-        categories: results.categoryScores.map((c) => ({
-          key: c.key,
-          label: c.label,
-          percentage: c.percentage,
-        })),
-      },
-      lowestDimension: results.lowestCategory.key,
-      commitment,
-    };
-
-    try {
-      await fetch("/api/lead-capture", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    } catch {
+    if (assessmentId) {
+      await trackAction(assessmentId, "strategy_session_clicked");
     }
-
-    setStatus("done");
+    setStrategyDone(true);
   }
 
-  if (status === "done") {
+  async function handleToolkit() {
+    if (assessmentId) {
+      await trackAction(assessmentId, "toolkit_clicked");
+    }
+  }
+
+  async function handleWorkshop() {
+    if (assessmentId) {
+      await trackAction(assessmentId, "workshop_clicked");
+    }
+  }
+
+  if (strategyDone) {
     return (
       <div className="bg-green-900/20 border border-green-700/40 rounded-2xl p-8 text-center">
         <div className="w-12 h-12 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center mx-auto mb-4">
@@ -72,10 +61,9 @@ export function CTASection({ results, email }: CTASectionProps) {
           </div>
           <button
             onClick={handleStrategySession}
-            disabled={status === "loading"}
-            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 disabled:opacity-60 text-white font-bold px-7 py-3.5 rounded-xl transition-all duration-200 text-sm shadow-lg shadow-purple-900/40 whitespace-nowrap flex-shrink-0"
+            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold px-7 py-3.5 rounded-xl transition-all duration-200 text-sm shadow-lg shadow-purple-900/40 whitespace-nowrap flex-shrink-0"
           >
-            {status === "loading" ? "Booking..." : "Book Free Session"}
+            Book Free Session
           </button>
         </div>
       </div>
@@ -85,14 +73,17 @@ export function CTASection({ results, email }: CTASectionProps) {
           {
             title: "CARES Leadership Toolkit",
             desc: "Frameworks and worksheets for daily practice",
+            handler: handleToolkit,
           },
           {
             title: "Team Workshop",
             desc: "Bring the CARES framework to your entire leadership team",
+            handler: handleWorkshop,
           },
         ].map((card) => (
           <div
             key={card.title}
+            onClick={card.handler}
             className="bg-slate-800/60 border border-slate-700 rounded-2xl p-5 cursor-pointer hover:border-slate-600 hover:bg-slate-800 transition-all group"
           >
             <h4 className="text-slate-300 font-semibold text-sm mb-1 group-hover:text-white transition-colors">

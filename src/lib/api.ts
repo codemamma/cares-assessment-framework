@@ -56,6 +56,25 @@ export async function submitAssessment(params: SubmitAssessmentParams): Promise<
   }
 }
 
+export async function trackAction(assessmentId: string, actionType: string): Promise<void> {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  try {
+    await fetch(`${supabaseUrl}/functions/v1/track-action`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseAnonKey}`,
+        "Apikey": supabaseAnonKey,
+      },
+      body: JSON.stringify({ assessmentId, actionType }),
+    });
+  } catch (err) {
+    console.error("Failed to track action:", err);
+  }
+}
+
 interface SaveCommitmentParams {
   assessmentId: string;
   focus_area: string;

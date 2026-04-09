@@ -203,7 +203,7 @@ export default function ResultsPage() {
               <h2 className="text-xl font-bold text-white mb-6">
                 Take action on your results
               </h2>
-              <CTASection results={results} email={email} />
+              <CTASection results={results} email={email} assessmentId={assessmentId} />
             </div>
           </div>
         </>
