@@ -5,6 +5,7 @@ import { isCategoryComplete } from '@/lib/scoring'
 import {
   saveAssessmentResponses,
   loadAssessmentResponses,
+  clearAssessmentResponses,
   saveCurrentStep,
   loadCurrentStep,
 } from '@/lib/storage'
@@ -13,6 +14,8 @@ import { ProgressHeader } from './ProgressHeader'
 import { CategorySection } from './CategorySection'
 import { NavigationControls } from './NavigationControls'
 
+const TOTAL_QUESTIONS = assessmentCategories.reduce((sum, cat) => sum + cat.questions.length, 0)
+
 export function AssessmentShell() {
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(0)
@@ -20,9 +23,15 @@ export function AssessmentShell() {
 
   useEffect(() => {
     const saved = loadAssessmentResponses()
-    const savedStep = loadCurrentStep()
-    setResponses(saved)
-    setCurrentStep(savedStep)
+    const isCompleted = Object.keys(saved).length === TOTAL_QUESTIONS
+    if (isCompleted) {
+      clearAssessmentResponses()
+      setResponses({})
+      setCurrentStep(0)
+    } else {
+      setResponses(saved)
+      setCurrentStep(loadCurrentStep())
+    }
   }, [])
 
   const category = assessmentCategories[currentStep]

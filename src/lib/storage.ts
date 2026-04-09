@@ -26,6 +26,8 @@ export function clearAssessmentResponses(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(KEYS.RESPONSES);
   localStorage.removeItem(KEYS.CURRENT_STEP);
+  localStorage.removeItem(KEYS.EMAIL);
+  localStorage.removeItem(KEYS.COMMITMENT);
 }
 
 export function saveCommitmentData(data: CommitmentData): void {
