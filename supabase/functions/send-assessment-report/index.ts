@@ -32,6 +32,7 @@ function scoreBarHtml(percentage: number): string {
 
 function buildEmailHtml(params: {
   email: string;
+  assessmentId: string;
   overall_score: number;
   score_band: string;
   categoryScores: { category_key: string; label: string; raw: number; max: number; percentage: number }[];
@@ -42,6 +43,7 @@ function buildEmailHtml(params: {
   commitment: { focus_area: string; practice: string; measure: string; support: string } | null;
 }): string {
   const {
+    assessmentId,
     overall_score,
     score_band,
     categoryScores,
@@ -222,6 +224,19 @@ function buildEmailHtml(params: {
             </td>
           </tr>
 
+          <tr><td style="height:16px;"></td></tr>
+
+          <!-- Book CTA -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0f2027,#1e293b);border:1px solid #334155;border-radius:16px;padding:28px;text-align:center;margin-bottom:32px;">
+              <h2 style="margin:0 0 8px;color:#f1f5f9;font-size:18px;font-weight:800;">Go deeper with the book</h2>
+              <p style="margin:0 0 20px;color:#94a3b8;font-size:13px;">Explore the full CARES framework and build lasting leadership habits with the companion book.</p>
+              <a href="https://scaretocares.com/track/book?assessmentId=${assessmentId}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
+                Get the Book on Amazon
+              </a>
+            </td>
+          </tr>
+
           <!-- Footer -->
           <tr>
             <td style="padding-top:24px;text-align:center;border-top:1px solid #1e293b;">
@@ -286,6 +301,7 @@ Deno.serve(async (req: Request) => {
       assessmentEmail = assessment.email;
       emailHtmlData = {
         email: assessment.email,
+        assessmentId: assessmentId!,
         overall_score: assessment.overall_score,
         score_band: assessment.score_band,
         categoryScores: categoryScores ?? [],
@@ -386,6 +402,7 @@ Deno.serve(async (req: Request) => {
       assessmentEmail = email;
       emailHtmlData = {
         email,
+        assessmentId: assessmentId!,
         overall_score: overall_score ?? 0,
         score_band: score_band ?? "",
         categoryScores: Array.isArray(incomingScores)
