@@ -319,6 +319,7 @@ Deno.serve(async (req: Request) => {
     } else {
       const {
         email,
+        role,
         overall_score,
         raw_score,
         score_band,
@@ -347,6 +348,7 @@ Deno.serve(async (req: Request) => {
         await supabase
           .from("assessments")
           .update({
+            role: role ?? "",
             overall_score: overall_score ?? 0,
             raw_score: raw_score ?? 0,
             score_band: score_band ?? "",
@@ -364,6 +366,7 @@ Deno.serve(async (req: Request) => {
           .from("assessments")
           .insert({
             email,
+            role: role ?? "",
             overall_score: overall_score ?? 0,
             raw_score: raw_score ?? 0,
             score_band: score_band ?? "",

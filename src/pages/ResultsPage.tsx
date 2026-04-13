@@ -11,7 +11,7 @@ import { RoadmapSteps, SuggestedReading } from '@/components/results/Recommendat
 import { CommitmentToGrowth } from '@/components/results/CommitmentToGrowth'
 import { CTASection } from '@/components/results/CTASection'
 import { recommendationsByCategory, chapterMap, supportingChapters } from '@/data/recommendations'
-import { submitAssessment } from '@/lib/api'
+import { submitAssessment, trackAction } from '@/lib/api'
 import { CareCategoryKey } from '@/types/assessment'
 
 function getReadingList(lowestCategory: CareCategoryKey) {
@@ -31,6 +31,7 @@ export default function ResultsPage() {
   const navigate = useNavigate()
   const [results, setResults] = useState<AssessmentResults | null>(null)
   const [email, setEmail] = useState<string | null>(null)
+  const [role, setRole] = useState<string>('')
   const [assessmentId, setAssessmentId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -53,12 +54,14 @@ export default function ResultsPage() {
     const savedEmail = loadEmailCapture()
     if (savedEmail?.email && computed) {
       setEmail(savedEmail.email)
+      setRole(savedEmail.role ?? '')
       const lowestKey = computed.lowestCategory.key
       const recs = recommendationsByCategory[lowestKey]
       const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
       const recommendedChapters = getReadingList(lowestKey)
       submitAssessment({
         email: savedEmail.email,
+        role: savedEmail.role ?? '',
         overall_score: computed.normalizedScore,
         raw_score: computed.rawScore,
         score_band: computed.scoreBand.label,
@@ -71,9 +74,10 @@ export default function ResultsPage() {
     }
   }, [navigate])
 
-  async function handleEmailUnlock(submittedEmail: string) {
+  async function handleEmailUnlock(submittedEmail: string, submittedRole: string) {
     setEmail(submittedEmail)
-    saveEmailCapture({ firstName: '', email: submittedEmail, role: '', company: '' })
+    setRole(submittedRole)
+    saveEmailCapture({ firstName: '', email: submittedEmail, role: submittedRole, company: '' })
     setTimeout(() => {
       document.getElementById('roadmap-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 100)
@@ -86,6 +90,7 @@ export default function ResultsPage() {
 
       const id = await submitAssessment({
         email: submittedEmail,
+        role: submittedRole,
         overall_score: results.normalizedScore,
         raw_score: results.rawScore,
         score_band: results.scoreBand.label,
@@ -96,6 +101,10 @@ export default function ResultsPage() {
         categoryScores: results.categoryScores,
       })
       if (id) setAssessmentId(id)
+
+      if (id) {
+        await trackAction(id, 'roadmap_unlock')
+      }
     }
   }
 

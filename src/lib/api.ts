@@ -2,6 +2,7 @@ import { CategoryScore } from "@/types/assessment";
 
 interface SubmitAssessmentParams {
   email: string;
+  role: string;
   overall_score: number;
   raw_score: number;
   score_band: string;
@@ -18,6 +19,7 @@ export async function submitAssessment(params: SubmitAssessmentParams): Promise<
 
   const body = {
     email: params.email,
+    role: params.role,
     overall_score: params.overall_score,
     raw_score: params.raw_score,
     score_band: params.score_band,
