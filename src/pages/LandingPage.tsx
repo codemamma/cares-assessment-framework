@@ -56,12 +56,30 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* LEFT — Author (renders second on mobile) */}
+            {/* LEFT — Book (renders second on mobile) */}
             <div className="order-2 md:order-1 flex flex-col items-center gap-4">
               <div className="relative">
                 <div className="absolute inset-0 rounded-2xl bg-purple-500/20 blur-xl" />
                 <img
-                  src="https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=400"
+                  src="/SCARE_to_CARES_final_front_cover.jpg"
+                  alt="Scare to CARES book cover"
+                  className="relative w-28 h-40 md:w-36 md:h-52 rounded-2xl object-cover border border-slate-700/60 shadow-2xl"
+                />
+              </div>
+              <div className="text-center">
+                <p className="text-white font-bold text-base">Scare to CARES</p>
+                <p className="text-slate-400 text-xs leading-relaxed mt-1 max-w-[180px]">
+                  A practical framework to move from fear-driven leadership to clarity and action.
+                </p>
+              </div>
+            </div>
+
+            {/* RIGHT — Author (renders third on mobile) */}
+            <div className="order-3 md:order-3 flex flex-col items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-2xl bg-purple-500/20 blur-xl" />
+                <img
+                  src="/Saby_Waraich_Headshot_2026.png"
                   alt="Saby Waraich"
                   className="relative w-36 h-36 md:w-44 md:h-44 rounded-2xl object-cover object-top border border-slate-700/60 shadow-2xl"
                 />
@@ -70,24 +88,6 @@ export default function LandingPage() {
                 <p className="text-white font-bold text-base">Saby Waraich</p>
                 <p className="text-slate-400 text-xs leading-relaxed mt-1 max-w-[180px]">
                   Keynote Speaker, Bestselling Author and Award winning CIO and CISO
-                </p>
-              </div>
-            </div>
-
-            {/* RIGHT — Book (renders third on mobile) */}
-            <div className="order-3 md:order-3 flex flex-col items-center gap-4">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-2xl bg-purple-500/20 blur-xl" />
-                <img
-                  src="https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=300"
-                  alt="Scare to CARES book cover"
-                  className="relative w-28 h-40 md:w-32 md:h-44 rounded-2xl object-cover border border-slate-700/60 shadow-2xl"
-                />
-              </div>
-              <div className="text-center">
-                <p className="text-white font-bold text-base">Scare to CARES</p>
-                <p className="text-slate-400 text-xs leading-relaxed mt-1 max-w-[180px]">
-                  A practical framework to move from fear-driven leadership to clarity and action.
                 </p>
               </div>
             </div>
