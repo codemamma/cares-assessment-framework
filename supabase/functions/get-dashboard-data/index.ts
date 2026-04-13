@@ -48,9 +48,10 @@ Deno.serve(async (req: Request) => {
     const totalStarted = allAssessments.length;
     const totalCompleted = allAssessments.filter((a) => a.completed_at !== null).length;
     const totalEmails = allAssessments.filter((a) => a.email && a.email.length > 0).length;
-    const strategyClicks = allActions.filter((a) => a.action_type === "strategy_session_clicked").length;
-    const toolkitClicks = allActions.filter((a) => a.action_type === "toolkit_clicked").length;
-    const workshopClicks = allActions.filter((a) => a.action_type === "workshop_clicked").length;
+    const strategyClicks = allActions.filter((a) => a.action_type === "strategy_session_clicked" || a.action_type === "strategy_session").length;
+    const toolkitClicks = allActions.filter((a) => a.action_type === "toolkit_clicked" || a.action_type === "toolkit").length;
+    const workshopClicks = allActions.filter((a) => a.action_type === "workshop_clicked" || a.action_type === "workshop").length;
+    const bookClicks = allActions.filter((a) => a.action_type === "book").length;
 
     const completionRate = totalStarted > 0 ? Math.round((totalCompleted / totalStarted) * 100) : 0;
     const emailCaptureRate = totalCompleted > 0 ? Math.round((totalEmails / totalCompleted) * 100) : 0;
@@ -58,6 +59,7 @@ Deno.serve(async (req: Request) => {
     const toolkitRate = totalEmails > 0 ? Math.round((toolkitClicks / totalEmails) * 100) : 0;
     const workshopRate = totalEmails > 0 ? Math.round((workshopClicks / totalEmails) * 100) : 0;
     const strategyRate = totalEmails > 0 ? Math.round((strategyClicks / totalEmails) * 100) : 0;
+    const bookRate = totalEmails > 0 ? Math.round((bookClicks / totalEmails) * 100) : 0;
 
     const dimensionKeys = [
       "communicate_with_empathy",
@@ -132,9 +134,11 @@ Deno.serve(async (req: Request) => {
         toolkitRate,
         workshopRate,
         strategyRate,
+        bookRate,
         toolkitClicks,
         workshopClicks,
         strategyClicks,
+        bookClicks,
       },
       leads,
     });

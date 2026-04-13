@@ -18,9 +18,11 @@ export interface DashboardData {
     toolkitRate: number;
     workshopRate: number;
     strategyRate: number;
+    bookRate: number;
     toolkitClicks: number;
     workshopClicks: number;
     strategyClicks: number;
+    bookClicks: number;
   };
   leads: {
     id: string;

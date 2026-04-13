@@ -40,6 +40,8 @@ function buildEmailHtml(params: {
   roadmap_steps: string[];
   recommended_chapters: { title: string; isPrimary: boolean }[];
   commitment: { focus_area: string; practice: string; measure: string; support: string } | null;
+  assessmentId: string;
+  supabaseUrl: string;
 }): string {
   const {
     overall_score,
@@ -50,6 +52,8 @@ function buildEmailHtml(params: {
     roadmap_steps,
     recommended_chapters,
     commitment,
+    assessmentId,
+    supabaseUrl,
   } = params;
 
   const lowestLabel = DIMENSION_LABELS[lowest_dimension] ?? lowest_dimension;
@@ -222,6 +226,19 @@ function buildEmailHtml(params: {
             </td>
           </tr>
 
+          <tr><td style="height:16px;"></td></tr>
+
+          <!-- Book CTA -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0c1e35,#1e293b);border:1px solid #1d4ed844;border-radius:16px;padding:28px;text-align:center;margin-bottom:32px;">
+              <h2 style="margin:0 0 8px;color:#f1f5f9;font-size:18px;font-weight:800;">Go deeper with the CARES framework</h2>
+              <p style="margin:0 0 20px;color:#94a3b8;font-size:13px;">Explore the full CARES framework and build lasting leadership habits</p>
+              <a href="${supabaseUrl}/functions/v1/track-action-and-redirect?assessmentId=${assessmentId}&actionType=book" style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
+                Get the Book on Amazon
+              </a>
+            </td>
+          </tr>
+
           <!-- Footer -->
           <tr>
             <td style="padding-top:24px;text-align:center;border-top:1px solid #1e293b;">
@@ -297,6 +314,8 @@ Deno.serve(async (req: Request) => {
         roadmap_steps: Array.isArray(assessment.roadmap_steps) ? assessment.roadmap_steps : [],
         recommended_chapters: Array.isArray(assessment.recommended_chapters) ? assessment.recommended_chapters : [],
         commitment: commitment ?? null,
+        assessmentId: assessmentId!,
+        supabaseUrl: Deno.env.get("SUPABASE_URL")!,
       };
     } else {
       const {
@@ -405,6 +424,8 @@ Deno.serve(async (req: Request) => {
         roadmap_steps: Array.isArray(roadmap_steps) ? roadmap_steps : [],
         recommended_chapters: Array.isArray(recommended_chapters) ? recommended_chapters : [],
         commitment: null,
+        assessmentId: assessmentId!,
+        supabaseUrl: Deno.env.get("SUPABASE_URL")!,
       };
     }
 

@@ -61,6 +61,13 @@ export function ActionInsights({ actions }: Props) {
           color="text-amber-400"
           barColor="bg-amber-500"
         />
+        <ActionRow
+          label="Book"
+          clicks={actions.bookClicks}
+          rate={actions.bookRate}
+          color="text-sky-400"
+          barColor="bg-sky-500"
+        />
       </div>
     </div>
   );

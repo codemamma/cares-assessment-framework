@@ -34,8 +34,12 @@ export function actionLabel(type: string | null): string {
   if (!type) return "—";
   const map: Record<string, string> = {
     strategy_session_clicked: "Strategy Session",
+    strategy_session: "Strategy Session",
     toolkit_clicked: "Toolkit",
+    toolkit: "Toolkit",
     workshop_clicked: "Workshop",
+    workshop: "Workshop",
+    book: "Book",
   };
   return map[type] ?? type.replace(/_/g, " ");
 }
