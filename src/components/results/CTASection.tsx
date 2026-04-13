@@ -56,7 +56,7 @@ export function CTASection({ assessmentId }: CTASectionProps) {
               1:1 Strategy Session
             </h3>
             <p className="text-slate-400 text-sm">
-              Book a free 15-minute strategy session with Saby Waraich and build your personal action plan.
+              Book a free 15-minute strategy session with Saby Waraich.
             </p>
           </div>
           <button

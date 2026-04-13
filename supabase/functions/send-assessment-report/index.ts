@@ -219,7 +219,7 @@ function buildEmailHtml(params: {
           <tr>
             <td style="background:linear-gradient(135deg,#3b1d8a,#1e293b);border:1px solid #7c3aed44;border-radius:16px;padding:28px;text-align:center;margin-bottom:32px;">
               <h2 style="margin:0 0 8px;color:#f1f5f9;font-size:18px;font-weight:800;">Ready to accelerate your growth?</h2>
-              <p style="margin:0 0 20px;color:#94a3b8;font-size:13px;">Book a free 15-minute strategy session with a CARES coach and build your personal action plan.</p>
+              <p style="margin:0 0 20px;color:#94a3b8;font-size:13px;">Book a free 15-minute strategy session with Saby Waraich.</p>
               <a href="#" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
                 Book a 15-min Strategy Session
               </a>
