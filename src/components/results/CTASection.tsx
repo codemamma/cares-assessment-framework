@@ -13,8 +13,9 @@ type ToastState = {
   message: string;
 };
 
-export function CTASection({ assessmentId }: CTASectionProps) {
-  const [strategyDone, setStrategyDone] = useState(false);
+const CALENDLY_URL = "https://calendly.com/waraich-saby/30min";
+
+export function CTASection({ assessmentId, email }: CTASectionProps) {
   const [toast, setToast] = useState<ToastState>({ visible: false, message: "" });
 
   function showToast(message: string) {
@@ -24,9 +25,12 @@ export function CTASection({ assessmentId }: CTASectionProps) {
 
   async function handleStrategySession() {
     if (assessmentId) {
-      await trackAction(assessmentId, "strategy_session_clicked");
+      await trackAction(assessmentId, "strategy_session");
     }
-    setStrategyDone(true);
+    const url = new URL(CALENDLY_URL);
+    url.searchParams.set("source", "cares_assessment");
+    if (email) url.searchParams.set("email", email);
+    window.open(url.toString(), "_blank");
   }
 
   async function handleToolkit() {
@@ -41,20 +45,6 @@ export function CTASection({ assessmentId }: CTASectionProps) {
       await trackAction(assessmentId, "org_assessment_interest");
     }
     showToast("Organizational assessment launching soon. Join the waitlist.");
-  }
-
-  if (strategyDone) {
-    return (
-      <div className="bg-green-900/20 border border-green-700/40 rounded-2xl p-8 text-center">
-        <div className="w-12 h-12 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center mx-auto mb-4">
-          <span className="text-green-400 text-xl">✓</span>
-        </div>
-        <h3 className="text-white font-bold text-lg mb-2">You're all set</h3>
-        <p className="text-slate-300 text-sm max-w-sm mx-auto leading-relaxed">
-          Your leadership roadmap has been shared. We'll reach out to schedule your session.
-        </p>
-      </div>
-    );
   }
 
   return (
