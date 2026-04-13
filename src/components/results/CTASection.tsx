@@ -100,10 +100,10 @@ export function CTASection({ assessmentId }: CTASectionProps) {
               Coming Soon
             </span>
           </div>
-          <p className="text-slate-500 text-xs leading-relaxed">
+          <p className="text-slate-400 text-xs leading-relaxed">
             Practical frameworks, worksheets, and guided exercises from each CARES dimension to help you apply your results in real-world leadership situations.
           </p>
-          <p className="text-slate-600 text-xs leading-relaxed mt-2">
+          <p className="text-slate-500 text-xs leading-relaxed mt-2">
             Includes chapter-based exercises, reflection prompts, and action templates.
           </p>
           <p className="text-slate-500 text-xs mt-3 group-hover:text-blue-400 transition-colors">
@@ -123,10 +123,10 @@ export function CTASection({ assessmentId }: CTASectionProps) {
               Coming Soon
             </span>
           </div>
-          <p className="text-slate-500 text-xs leading-relaxed">
+          <p className="text-slate-400 text-xs leading-relaxed">
             Assess alignment, communication, and leadership effectiveness across your entire team or organization.
           </p>
-          <p className="text-slate-600 text-xs leading-relaxed mt-2">
+          <p className="text-slate-500 text-xs leading-relaxed mt-2">
             Designed for leadership teams and enterprise workshops.
           </p>
           <p className="text-slate-500 text-xs mt-3 group-hover:text-blue-400 transition-colors">
