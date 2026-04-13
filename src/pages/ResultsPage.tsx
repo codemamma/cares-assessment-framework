@@ -11,7 +11,7 @@ import { RoadmapSteps, SuggestedReading } from '@/components/results/Recommendat
 import { CommitmentToGrowth } from '@/components/results/CommitmentToGrowth'
 import { CTASection } from '@/components/results/CTASection'
 import { recommendationsByCategory, chapterMap, supportingChapters } from '@/data/recommendations'
-import { submitAssessment, trackAction } from '@/lib/api'
+import { submitAssessment } from '@/lib/api'
 import { CareCategoryKey } from '@/types/assessment'
 
 function getReadingList(lowestCategory: CareCategoryKey) {
@@ -101,10 +101,6 @@ export default function ResultsPage() {
         categoryScores: results.categoryScores,
       })
       if (id) setAssessmentId(id)
-
-      if (id) {
-        await trackAction(id, 'roadmap_unlock')
-      }
     }
   }
 
