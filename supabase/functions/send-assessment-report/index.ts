@@ -231,7 +231,6 @@ function buildEmailHtml(params: {
           <!-- Book CTA -->
           <tr>
             <td style="background:linear-gradient(135deg,#0c1e35,#1e293b);border:1px solid #1d4ed844;border-radius:16px;padding:28px;text-align:center;margin-bottom:32px;">
-              <h2 style="margin:0 0 8px;color:#f1f5f9;font-size:18px;font-weight:800;">Go deeper with the CARES framework</h2>
               <p style="margin:0 0 20px;color:#94a3b8;font-size:13px;">Explore the full CARES framework and build lasting leadership habits</p>
               <a href="${supabaseUrl}/functions/v1/track-action-and-redirect?assessmentId=${assessmentId}&actionType=book" style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
                 Get the Book on Amazon

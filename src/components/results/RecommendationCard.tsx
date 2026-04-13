@@ -9,19 +9,14 @@ export function RoadmapSteps({ lowestCategory }: RoadmapStepsProps) {
   const data = recommendationsByCategory[lowestCategory];
   if (!data) return null;
 
-  const shortRecs = data.recommendations.map((r) => {
-    const sentence = r.split(/[.!?]/)[0];
-    return sentence.length > 120 ? sentence.slice(0, 117) + "..." : sentence;
-  });
-
   return (
     <div className="space-y-3">
-      {shortRecs.map((rec, i) => (
+      {data.recommendations.map((rec, i) => (
         <div key={i} className="flex gap-4 bg-slate-800 rounded-2xl p-5 border border-slate-700">
           <div className="flex-shrink-0 w-7 h-7 rounded-full bg-sky-500/20 border border-sky-500/40 flex items-center justify-center mt-0.5">
             <span className="text-sky-300 text-xs font-bold">{i + 1}</span>
           </div>
-          <p className="text-slate-300 text-sm leading-relaxed pt-0.5">{rec}.</p>
+          <p className="text-slate-300 text-sm leading-relaxed pt-0.5">{rec}</p>
         </div>
       ))}
     </div>
