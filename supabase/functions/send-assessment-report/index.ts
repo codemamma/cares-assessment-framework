@@ -246,6 +246,9 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    console.log("🔥 EMAIL FUNCTION TRIGGERED: send-assessment-report");
+    console.log("📧 SENDING FROM:", "reports@mail.scaretocares.com");
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
