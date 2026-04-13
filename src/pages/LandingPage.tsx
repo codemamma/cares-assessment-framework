@@ -11,44 +11,91 @@ export default function LandingPage() {
               "radial-gradient(ellipse 80% 60% at 50% -20%, #8b5cf6 0%, transparent 60%)",
           }}
         />
-        <div className="relative max-w-4xl mx-auto px-4 py-24 text-center">
-          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 text-xs font-semibold text-purple-300 uppercase tracking-wider mb-8">
-            Leadership Framework
-          </div>
 
-          <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight tracking-tight">
-            CARES Leadership{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-200">
-              Self-Assessment
-            </span>
-          </h1>
+        {/* Hero 3-column grid */}
+        <div className="relative max-w-6xl mx-auto px-4 pt-20 pb-16">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-8 items-center">
 
-          <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Gain an honest, reflective view of your leadership capabilities
-            across five dimensions that define the most effective leaders today.
-          </p>
+            {/* CENTER — hero content (renders first on mobile) */}
+            <div className="order-1 md:order-2 text-center">
+              <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 text-xs font-semibold text-purple-300 uppercase tracking-wider mb-8">
+                Leadership Framework
+              </div>
 
-          <div className="inline-flex items-center gap-2 bg-slate-800/60 border border-slate-700 rounded-full px-5 py-2 text-sm text-slate-300 mb-12">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 inline-block" />
-            5 dimensions
-            <span className="text-slate-600">·</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 inline-block" />
-            25 behaviors
-            <span className="text-slate-600">·</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block" />
-            3–5 minutes
-          </div>
+              <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight tracking-tight">
+                CARES Leadership{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-200">
+                  Self-Assessment
+                </span>
+              </h1>
 
-          <div className="flex justify-center mb-20">
-            <Link
-              to="/assessment"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all duration-200 shadow-xl shadow-purple-900/40 hover:shadow-purple-900/60 hover:scale-105"
-            >
-              Start Assessment
-              <span className="text-purple-200">→</span>
-            </Link>
+              <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+                Gain an honest, reflective view of your leadership capabilities
+                across five dimensions that define the most effective leaders today.
+              </p>
+
+              <div className="inline-flex items-center gap-2 bg-slate-800/60 border border-slate-700 rounded-full px-5 py-2 text-sm text-slate-300 mb-12">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 inline-block" />
+                5 dimensions
+                <span className="text-slate-600">·</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 inline-block" />
+                25 behaviors
+                <span className="text-slate-600">·</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block" />
+                3–5 minutes
+              </div>
+
+              <div className="flex justify-center">
+                <Link
+                  to="/assessment"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all duration-200 shadow-xl shadow-purple-900/40 hover:shadow-purple-900/60 hover:scale-105"
+                >
+                  Start Assessment
+                  <span className="text-purple-200">→</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* LEFT — Author (renders second on mobile) */}
+            <div className="order-2 md:order-1 flex flex-col items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-2xl bg-purple-500/20 blur-xl" />
+                <img
+                  src="https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=400"
+                  alt="Saby Waraich"
+                  className="relative w-36 h-36 md:w-44 md:h-44 rounded-2xl object-cover object-top border border-slate-700/60 shadow-2xl"
+                />
+              </div>
+              <div className="text-center">
+                <p className="text-white font-bold text-base">Saby Waraich</p>
+                <p className="text-slate-400 text-xs leading-relaxed mt-1 max-w-[180px]">
+                  Keynote Speaker, Bestselling Author and Award winning CIO and CISO
+                </p>
+              </div>
+            </div>
+
+            {/* RIGHT — Book (renders third on mobile) */}
+            <div className="order-3 md:order-3 flex flex-col items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-2xl bg-purple-500/20 blur-xl" />
+                <img
+                  src="https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=300"
+                  alt="Scare to CARES book cover"
+                  className="relative w-28 h-40 md:w-32 md:h-44 rounded-2xl object-cover border border-slate-700/60 shadow-2xl"
+                />
+              </div>
+              <div className="text-center">
+                <p className="text-white font-bold text-base">Scare to CARES</p>
+                <p className="text-slate-400 text-xs leading-relaxed mt-1 max-w-[180px]">
+                  A practical framework to move from fear-driven leadership to clarity and action.
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
+
+        <div className="pb-8" />
       </div>
 
       <div className="max-w-4xl mx-auto px-4 pb-24">
