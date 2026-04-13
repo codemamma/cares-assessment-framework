@@ -138,7 +138,7 @@ export default function LandingPage() {
 
         <div className="text-center">
           <p className="text-slate-500 text-sm mb-6">
-            No signup required. Your responses stay on your device.
+            No account needed. Your email is only used to send your report and roadmap — nothing else.
           </p>
           <Link
             to="/assessment"
