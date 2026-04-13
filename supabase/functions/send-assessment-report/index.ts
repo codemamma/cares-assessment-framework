@@ -413,6 +413,12 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Email service not configured" }, 500);
     }
 
+    const userEmail = assessmentEmail;
+    if (!userEmail) {
+      console.error("Missing recipient email");
+      return json({ error: "Missing recipient email" }, 400);
+    }
+
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -420,8 +426,9 @@ Deno.serve(async (req: Request) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "CARES Assessment <onboarding@resend.dev>",
-        to: [assessmentEmail],
+        from: "CARES Leadership Report <reports@mail.scaretocares.com>",
+        to: [userEmail],
+        reply_to: "saby@scaretocares.com",
         subject: "Your CARES Leadership Report",
         html: emailHtml,
       }),
@@ -429,9 +436,12 @@ Deno.serve(async (req: Request) => {
 
     if (!emailResponse.ok) {
       const errorData = await emailResponse.json();
-      console.error("Resend error:", errorData);
+      console.error("Resend email error:", errorData);
       return json({ error: "Failed to send email", detail: errorData }, 500);
     }
+
+    const successData = await emailResponse.json();
+    console.log("Resend email success:", successData);
 
     await supabase
       .from("assessments")
