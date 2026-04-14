@@ -55,10 +55,10 @@ export function CTASection({ assessmentId, email }: CTASectionProps) {
         </div>
       )}
 
-      <div className="bg-gradient-to-br from-blue-900/40 to-slate-900 border border-blue-500/30 rounded-2xl p-7">
+      <div className="bg-gradient-to-br from-purple-900/40 to-slate-900 border border-purple-500/30 rounded-2xl p-7">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div>
-            <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1">
+            <p className="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-1">
               Recommended
             </p>
             <h3 className="text-white font-bold text-lg mb-1">
@@ -70,7 +70,7 @@ export function CTASection({ assessmentId, email }: CTASectionProps) {
           </div>
           <button
             onClick={handleStrategySession}
-            className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold px-7 py-3.5 rounded-xl transition-all duration-200 text-sm shadow-lg shadow-blue-900/40 whitespace-nowrap flex-shrink-0"
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-7 py-3.5 rounded-xl transition-all duration-200 ease-in-out text-sm shadow-md shadow-purple-900/40 whitespace-nowrap flex-shrink-0 hover:scale-105"
           >
             Book Free Session
           </button>
@@ -96,7 +96,7 @@ export function CTASection({ assessmentId, email }: CTASectionProps) {
           <p className="text-slate-500 text-xs leading-relaxed mt-2">
             Includes chapter-based exercises, reflection prompts, and action templates.
           </p>
-          <p className="text-slate-500 text-xs mt-3 group-hover:text-blue-400 transition-colors">
+          <p className="text-slate-500 text-xs mt-3 group-hover:text-purple-400 transition-colors">
             Explore Toolkit →
           </p>
         </div>

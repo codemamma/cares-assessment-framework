@@ -41,7 +41,7 @@ const scoreBands: ScoreBand[] = [
   {
     min: 0,
     max: 39,
-    label: "Development",
+    label: "Emerging",
     title: "Significant Development Opportunity",
     summary:
       "Your current leadership approach shows meaningful development opportunities.",

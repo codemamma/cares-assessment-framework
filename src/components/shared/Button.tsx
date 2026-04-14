@@ -18,7 +18,7 @@ export function Button({
       className={cn(
         "inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
         variant === "primary" &&
-          "bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white focus:ring-purple-500 shadow-lg shadow-purple-900/30",
+          "bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white focus:ring-purple-500 shadow-md shadow-purple-900/30 hover:scale-105",
         variant === "secondary" &&
           "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 focus:ring-slate-500",
         variant === "ghost" &&
