@@ -52,6 +52,7 @@ Deno.serve(async (req: Request) => {
     const toolkitClicks = allActions.filter((a) => a.action_type === "toolkit_clicked" || a.action_type === "toolkit").length;
     const workshopClicks = allActions.filter((a) => a.action_type === "workshop_clicked" || a.action_type === "workshop").length;
     const bookClicks = allActions.filter((a) => a.action_type === "book").length;
+    const commitmentClicks = allActions.filter((a) => a.action_type === "commitment").length;
 
     const completionRate = totalStarted > 0 ? Math.round((totalCompleted / totalStarted) * 100) : 0;
     const emailCaptureRate = totalCompleted > 0 ? Math.round((totalEmails / totalCompleted) * 100) : 0;
@@ -60,6 +61,7 @@ Deno.serve(async (req: Request) => {
     const workshopRate = totalEmails > 0 ? Math.round((workshopClicks / totalEmails) * 100) : 0;
     const strategyRate = totalEmails > 0 ? Math.round((strategyClicks / totalEmails) * 100) : 0;
     const bookRate = totalEmails > 0 ? Math.round((bookClicks / totalEmails) * 100) : 0;
+    const commitmentRate = totalEmails > 0 ? Math.round((commitmentClicks / totalEmails) * 100) : 0;
 
     const dimensionKeys = [
       "communicate_with_empathy",
@@ -135,10 +137,12 @@ Deno.serve(async (req: Request) => {
         workshopRate,
         strategyRate,
         bookRate,
+        commitmentRate,
         toolkitClicks,
         workshopClicks,
         strategyClicks,
         bookClicks,
+        commitmentClicks,
       },
       leads,
     });

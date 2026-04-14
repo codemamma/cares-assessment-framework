@@ -40,6 +40,7 @@ export function actionLabel(type: string | null): string {
     workshop_clicked: "Workshop",
     workshop: "Workshop",
     book: "Book",
+    commitment: "Commitment Submitted",
   };
   return map[type] ?? type.replace(/_/g, " ");
 }

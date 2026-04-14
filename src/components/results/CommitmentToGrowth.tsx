@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { assessmentCategories } from "@/data/caresQuestions";
 import { CommitmentData, CareCategoryKey } from "@/types/assessment";
 import { saveCommitmentData, loadCommitmentData } from "@/lib/storage";
-import { saveCommitment } from "@/lib/api";
+import { saveCommitment, trackAction } from "@/lib/api";
 
 interface Props {
   assessmentId: string | null;
@@ -47,6 +47,9 @@ export function CommitmentToGrowth({ assessmentId }: Props) {
         measure: data.measure,
         support: data.support,
       });
+      if (success) {
+        await trackAction(assessmentId, "commitment");
+      }
     } else {
       success = true;
     }

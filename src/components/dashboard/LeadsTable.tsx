@@ -16,8 +16,13 @@ function actionBadge(type: string | null) {
   if (!type) return "text-slate-600";
   const map: Record<string, string> = {
     strategy_session_clicked: "text-amber-400",
+    strategy_session: "text-amber-400",
     toolkit_clicked: "text-blue-400",
+    toolkit: "text-blue-400",
     workshop_clicked: "text-green-400",
+    workshop: "text-green-400",
+    book: "text-sky-400",
+    commitment: "text-teal-400",
   };
   return map[type] ?? "text-slate-400";
 }

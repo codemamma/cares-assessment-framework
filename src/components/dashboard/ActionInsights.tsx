@@ -68,6 +68,13 @@ export function ActionInsights({ actions }: Props) {
           color="text-sky-400"
           barColor="bg-sky-500"
         />
+        <ActionRow
+          label="Commitment"
+          clicks={actions.commitmentClicks}
+          rate={actions.commitmentRate}
+          color="text-teal-400"
+          barColor="bg-teal-500"
+        />
       </div>
     </div>
   );
