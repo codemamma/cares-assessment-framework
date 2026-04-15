@@ -35,7 +35,7 @@ export default function DashboardPage() {
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex items-start justify-between mb-10">
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+            <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">
               CARES Assessment
             </p>
             <h1 className="text-3xl font-black text-white">Author Dashboard</h1>

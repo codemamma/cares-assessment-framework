@@ -29,7 +29,7 @@ export function HighIntentLeads({ leads }: Props) {
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6">
-      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Priority</p>
+      <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">Priority</p>
       <h2 className="text-lg font-bold text-white mb-4">
         High Intent Leads
       </h2>

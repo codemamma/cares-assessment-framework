@@ -50,12 +50,12 @@ export function ConversionFunnel({ kpis, funnel }: Props) {
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+      <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">
         Conversion Funnel
       </p>
       <h2 className="text-lg font-bold text-white mb-1">From start to action</h2>
       <p className="text-xs text-slate-500 mb-6">
-        Insight: {funnel.completionRate}% of users complete the assessment, indicating{" "}
+        Insight: <span className="text-violet-400 font-semibold">{funnel.completionRate}%</span> of users complete the assessment, indicating{" "}
         <span className="text-slate-400 font-medium">{engagementLabel}</span> engagement.
       </p>
 

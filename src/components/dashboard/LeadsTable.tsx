@@ -45,7 +45,7 @@ export function LeadsTable({ leads }: Props) {
   if (leads.length === 0) {
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Leads</p>
+        <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">Leads</p>
         <h2 className="text-lg font-bold text-white mb-4">Recent Leadership Assessments</h2>
         <p className="text-slate-500 text-sm">No leads yet.</p>
       </div>
@@ -54,7 +54,7 @@ export function LeadsTable({ leads }: Props) {
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Leads</p>
+      <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">Leads</p>
       <h2 className="text-lg font-bold text-white mb-4">
         Recent Leadership Assessments{" "}
         <span className="text-slate-600 text-sm font-normal">(last 50)</span>
