@@ -29,6 +29,7 @@ export interface DashboardData {
   leads: {
     id: string;
     email: string;
+    name: string | null;
     overall_score: number;
     lowest_dimension: string;
     strongest_dimension: string;

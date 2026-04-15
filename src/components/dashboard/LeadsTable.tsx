@@ -76,8 +76,13 @@ export function LeadsTable({ leads }: Props) {
                 key={lead.id}
                 className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors"
               >
-                <td className="py-3 pr-4 text-slate-200 font-medium max-w-[200px] truncate">
-                  {lead.email || <span className="text-slate-600 italic">not captured</span>}
+                <td className="py-3 pr-4 text-slate-200 font-medium max-w-[220px] truncate">
+                  {lead.email
+                    ? lead.name
+                      ? <>{lead.name} <span className="text-slate-500 font-normal">({lead.email})</span></>
+                      : lead.email
+                    : <span className="text-slate-600 italic">not captured</span>
+                  }
                 </td>
                 <td className="py-3 pr-4">
                   <span
