@@ -5,43 +5,6 @@ interface Props {
   leads: DashboardData["leads"];
 }
 
-type LeadRow = DashboardData["leads"][number];
-
-interface GroupedLead extends LeadRow {
-  actions: string[];
-  primaryAction: string | null;
-}
-
-const PRIORITY_ORDER = [
-  "strategy session",
-  "org assessment interest",
-  "toolkit interest",
-  "book order",
-];
-
-function groupLeads(leads: DashboardData["leads"]): GroupedLead[] {
-  const grouped = leads.reduce<Record<string, GroupedLead>>((acc, item) => {
-    const key = item.assessment_id || `${item.email}-${item.created_at}`;
-    if (!acc[key]) {
-      acc[key] = { ...item, actions: [] };
-    }
-    if (item.last_action && item.last_action !== "No Action Yet") {
-      acc[key].actions.push(item.last_action);
-    }
-    return acc;
-  }, {});
-
-  return Object.values(grouped).map((item) => {
-    const uniqueActions = [...new Set(item.actions)];
-    const primaryAction =
-      PRIORITY_ORDER.find((priority) =>
-        uniqueActions.some((action) =>
-          action.toLowerCase().includes(priority)
-        )
-      ) || uniqueActions[0] || null;
-    return { ...item, actions: uniqueActions, primaryAction };
-  });
-}
 
 function scoreBadgeClass(score: number) {
   if (score >= 75) return "bg-green-900/50 text-green-300 border border-green-800/60";
@@ -81,7 +44,7 @@ function actionBadge(type: string | null) {
 }
 
 export function LeadsTable({ leads }: Props) {
-  const groupedLeads = groupLeads(leads);
+  const groupedLeads = leads;
 
   if (groupedLeads.length === 0) {
     return (
@@ -157,11 +120,11 @@ export function LeadsTable({ leads }: Props) {
                 <td className="py-3 pr-4 text-slate-400 text-xs max-w-[150px]">
                   {lead.strongest_dimension ? dimensionLabel(lead.strongest_dimension) : "—"}
                 </td>
-                <td className={`py-3 pr-4 text-xs font-medium ${actionBadge(lead.primaryAction)}`}>
-                  {lead.primaryAction ? actionLabel(lead.primaryAction) : "No Action Yet"}
-                  {lead.actions.length > 1 && (
+                <td className={`py-3 pr-4 text-xs font-medium ${actionBadge(lead.last_action)}`}>
+                  {lead.last_action ? actionLabel(lead.last_action) : "No Action Yet"}
+                  {lead.all_actions.length > 1 && (
                     <span className="ml-2 text-xs text-gray-400 font-normal">
-                      +{lead.actions.length - 1} more
+                      +{lead.all_actions.length - 1} more
                     </span>
                   )}
                 </td>

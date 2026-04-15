@@ -115,29 +115,71 @@ Deno.serve(async (req: Request) => {
     }
     const mostCommonWeak = Object.entries(weaknessCounts).sort((a, b) => b[1] - a[1])[0];
 
-    const actionsByAssessment: Record<string, { type: string; created_at: string }> = {};
-    for (const action of allActions) {
-      if (!action.assessment_id) continue;
-      const existing = actionsByAssessment[action.assessment_id];
-      if (!existing || action.created_at > existing.created_at) {
-        actionsByAssessment[action.assessment_id] = {
-          type: action.action_type,
-          created_at: action.created_at,
-        };
-      }
+    const assessmentIdsByEmail: Record<string, string[]> = {};
+    for (const a of allAssessments) {
+      const key = a.email ?? a.id;
+      if (!assessmentIdsByEmail[key]) assessmentIdsByEmail[key] = [];
+      assessmentIdsByEmail[key].push(a.id);
     }
 
-    const leads = allAssessments.slice(0, 50).map((a) => ({
-      id: a.id,
-      email: a.email,
-      name: a.name ?? null,
-      overall_score: a.overall_score,
-      score_band: a.score_band ?? null,
-      lowest_dimension: a.lowest_dimension,
-      strongest_dimension: a.strongest_dimension,
-      last_action: actionsByAssessment[a.id]?.type ?? null,
-      created_at: a.created_at,
-    }));
+    const actionsByAssessmentId: Record<string, string[]> = {};
+    for (const action of allActions) {
+      if (!action.assessment_id) continue;
+      if (!actionsByAssessmentId[action.assessment_id]) actionsByAssessmentId[action.assessment_id] = [];
+      actionsByAssessmentId[action.assessment_id].push(action.action_type);
+    }
+
+    const PRIORITY_ORDER = [
+      "strategy_session_clicked",
+      "strategy_session",
+      "org_assessment_interest",
+      "toolkit_clicked",
+      "toolkit",
+      "book",
+      "commitment",
+      "workshop_clicked",
+      "workshop",
+    ];
+
+    const seenEmails = new Set<string>();
+    const leads: {
+      id: string;
+      email: string;
+      name: string | null;
+      overall_score: number;
+      score_band: string | null;
+      lowest_dimension: string;
+      strongest_dimension: string;
+      all_actions: string[];
+      last_action: string | null;
+      created_at: string;
+    }[] = [];
+
+    for (const a of allAssessments) {
+      const key = a.email ?? a.id;
+      if (seenEmails.has(key)) continue;
+      seenEmails.add(key);
+
+      const siblingIds = assessmentIdsByEmail[key] ?? [a.id];
+      const allActionsForEmail = siblingIds.flatMap((id) => actionsByAssessmentId[id] ?? []);
+      const uniqueActions = [...new Set(allActionsForEmail)];
+      const primaryAction = PRIORITY_ORDER.find((p) => uniqueActions.includes(p)) ?? uniqueActions[0] ?? null;
+
+      leads.push({
+        id: a.id,
+        email: a.email,
+        name: a.name ?? null,
+        overall_score: a.overall_score,
+        score_band: a.score_band ?? null,
+        lowest_dimension: a.lowest_dimension,
+        strongest_dimension: a.strongest_dimension,
+        all_actions: uniqueActions,
+        last_action: primaryAction,
+        created_at: a.created_at,
+      });
+
+      if (leads.length >= 50) break;
+    }
 
     return json({
       kpis: {

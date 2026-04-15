@@ -37,13 +37,13 @@ export interface DashboardData {
   };
   leads: {
     id: string;
-    assessment_id: string | null;
     email: string;
     name: string | null;
     overall_score: number;
     score_band: string | null;
     lowest_dimension: string;
     strongest_dimension: string;
+    all_actions: string[];
     last_action: string | null;
     created_at: string;
   }[];
