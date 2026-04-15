@@ -32,6 +32,7 @@ export default function ResultsPage() {
   const [results, setResults] = useState<AssessmentResults | null>(null)
   const [email, setEmail] = useState<string | null>(null)
   const [role, setRole] = useState<string>('')
+  const [name, setName] = useState<string>('')
   const [assessmentId, setAssessmentId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -55,6 +56,7 @@ export default function ResultsPage() {
     if (savedEmail?.email && computed) {
       setEmail(savedEmail.email)
       setRole(savedEmail.role ?? '')
+      setName(savedEmail.firstName ?? '')
       const lowestKey = computed.lowestCategory.key
       const recs = recommendationsByCategory[lowestKey]
       const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
@@ -62,6 +64,7 @@ export default function ResultsPage() {
       submitAssessment({
         email: savedEmail.email,
         role: savedEmail.role ?? '',
+        name: savedEmail.firstName || null,
         overall_score: computed.normalizedScore,
         raw_score: computed.rawScore,
         score_band: computed.scoreBand.label,
@@ -74,10 +77,11 @@ export default function ResultsPage() {
     }
   }, [navigate])
 
-  async function handleEmailUnlock(submittedEmail: string, submittedRole: string) {
+  async function handleEmailUnlock(submittedEmail: string, submittedRole: string, submittedName: string) {
     setEmail(submittedEmail)
     setRole(submittedRole)
-    saveEmailCapture({ firstName: '', email: submittedEmail, role: submittedRole, company: '' })
+    setName(submittedName)
+    saveEmailCapture({ firstName: submittedName, email: submittedEmail, role: submittedRole, company: '' })
     setTimeout(() => {
       document.getElementById('roadmap-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 100)
@@ -91,6 +95,7 @@ export default function ResultsPage() {
       const id = await submitAssessment({
         email: submittedEmail,
         role: submittedRole,
+        name: submittedName || null,
         overall_score: results.normalizedScore,
         raw_score: results.rawScore,
         score_band: results.scoreBand.label,

@@ -1,10 +1,11 @@
 import { useState } from "react";
 
 interface EmailGateProps {
-  onUnlock: (email: string, role: string) => void;
+  onUnlock: (email: string, role: string, name: string) => void;
 }
 
 export function EmailGate({ onUnlock }: EmailGateProps) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [errors, setErrors] = useState<{ email?: string; role?: string }>({});
@@ -23,7 +24,7 @@ export function EmailGate({ onUnlock }: EmailGateProps) {
       return;
     }
     setErrors({});
-    onUnlock(email, role.trim());
+    onUnlock(email, role.trim(), name.trim());
   }
 
   return (
@@ -39,6 +40,17 @@ export function EmailGate({ onUnlock }: EmailGateProps) {
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <div>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter your name"
+            className="w-full bg-slate-800 border border-slate-600 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            autoComplete="given-name"
+          />
+          <p className="text-slate-600 text-xs mt-1">First name (optional)</p>
+        </div>
         <div>
           <input
             type="email"

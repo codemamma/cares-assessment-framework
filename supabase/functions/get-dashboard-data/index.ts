@@ -32,7 +32,7 @@ Deno.serve(async (req: Request) => {
     ] = await Promise.all([
       supabase
         .from("assessments")
-        .select("id, email, overall_score, lowest_dimension, strongest_dimension, completed_at, created_at")
+        .select("id, email, name, overall_score, lowest_dimension, strongest_dimension, completed_at, created_at")
         .order("created_at", { ascending: false }),
       supabase
         .from("assessment_actions")
@@ -107,6 +107,7 @@ Deno.serve(async (req: Request) => {
     const leads = allAssessments.slice(0, 50).map((a) => ({
       id: a.id,
       email: a.email,
+      name: a.name ?? null,
       overall_score: a.overall_score,
       lowest_dimension: a.lowest_dimension,
       strongest_dimension: a.strongest_dimension,

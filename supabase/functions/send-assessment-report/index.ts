@@ -320,6 +320,7 @@ Deno.serve(async (req: Request) => {
       const {
         email,
         role,
+        name,
         overall_score,
         raw_score,
         score_band,
@@ -349,6 +350,7 @@ Deno.serve(async (req: Request) => {
           .from("assessments")
           .update({
             role: role ?? "",
+            name: name || null,
             overall_score: overall_score ?? 0,
             raw_score: raw_score ?? 0,
             score_band: score_band ?? "",
@@ -367,6 +369,7 @@ Deno.serve(async (req: Request) => {
           .insert({
             email,
             role: role ?? "",
+            name: name || null,
             overall_score: overall_score ?? 0,
             raw_score: raw_score ?? 0,
             score_band: score_band ?? "",
