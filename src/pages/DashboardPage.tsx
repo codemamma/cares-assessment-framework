@@ -6,6 +6,8 @@ import { ConversionFunnel } from "@/components/dashboard/ConversionFunnel";
 import { DimensionInsights } from "@/components/dashboard/DimensionInsights";
 import { ActionInsights } from "@/components/dashboard/ActionInsights";
 import { LeadsTable } from "@/components/dashboard/LeadsTable";
+import { SummaryStrip } from "@/components/dashboard/SummaryStrip";
+import { HighIntentLeads } from "@/components/dashboard/HighIntentLeads";
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -69,12 +71,16 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-6">
             <KpiCards kpis={data.kpis} />
 
+            <SummaryStrip summary={data.summary} />
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ConversionFunnel kpis={data.kpis} funnel={data.funnel} />
               <DimensionInsights dimensions={data.dimensions} />
             </div>
 
             <ActionInsights actions={data.actions} />
+
+            <HighIntentLeads leads={data.leads} />
 
             <LeadsTable leads={data.leads} />
           </div>

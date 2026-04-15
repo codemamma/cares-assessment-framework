@@ -29,7 +29,12 @@ export function DimensionInsights({ dimensions }: Props) {
       <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
         Dimension Insights
       </p>
-      <h2 className="text-lg font-bold text-white mb-6">Average score per capability</h2>
+      <h2 className="text-lg font-bold text-white mb-1">Average score per capability</h2>
+      <p className="text-xs text-slate-500 mb-6">
+        {weakLabel
+          ? <>Insight: Most users show gaps in <span className="text-slate-400 font-medium">{weakLabel}</span>, presenting an opportunity for targeted support.</>
+          : "Insight: Not enough data yet to identify common gaps."}
+      </p>
 
       <div className="flex flex-col gap-4 mb-6">
         {dimensions.averages.map((dim) => (
