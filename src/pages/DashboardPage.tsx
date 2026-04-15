@@ -6,6 +6,8 @@ import { ConversionFunnel } from "@/components/dashboard/ConversionFunnel";
 import { DimensionInsights } from "@/components/dashboard/DimensionInsights";
 import { ActionInsights } from "@/components/dashboard/ActionInsights";
 import { LeadsTable } from "@/components/dashboard/LeadsTable";
+import { SummaryStrip } from "@/components/dashboard/SummaryStrip";
+import { HighIntentLeads } from "@/components/dashboard/HighIntentLeads";
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -33,7 +35,7 @@ export default function DashboardPage() {
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex items-start justify-between mb-10">
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+            <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">
               CARES Assessment
             </p>
             <h1 className="text-3xl font-black text-white">Author Dashboard</h1>
@@ -69,12 +71,16 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-6">
             <KpiCards kpis={data.kpis} />
 
+            <SummaryStrip summary={data.summary} />
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ConversionFunnel kpis={data.kpis} funnel={data.funnel} />
               <DimensionInsights dimensions={data.dimensions} />
             </div>
 
             <ActionInsights actions={data.actions} />
+
+            <HighIntentLeads leads={data.leads} />
 
             <LeadsTable leads={data.leads} />
           </div>

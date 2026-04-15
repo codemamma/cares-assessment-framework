@@ -5,15 +5,30 @@ interface Props {
   leads: DashboardData["leads"];
 }
 
-function scoreBadge(score: number) {
+function scoreBadgeClass(score: number) {
   if (score >= 75) return "bg-green-900/50 text-green-300 border border-green-800/60";
   if (score >= 55) return "bg-blue-900/50 text-blue-300 border border-blue-800/60";
   if (score >= 40) return "bg-amber-900/50 text-amber-300 border border-amber-800/60";
   return "bg-red-900/50 text-red-300 border border-red-800/60";
 }
 
+function scoreBandTextClass(score: number) {
+  if (score >= 75) return "text-green-500";
+  if (score >= 55) return "text-blue-500";
+  if (score >= 40) return "text-amber-500";
+  return "text-red-500";
+}
+
+function scoreBandLabel(band: string | null, score: number): string {
+  if (band) return band;
+  if (score >= 80) return "Strong";
+  if (score >= 60) return "Developing";
+  if (score >= 40) return "Transition";
+  return "Emerging";
+}
+
 function actionBadge(type: string | null) {
-  if (!type) return "text-slate-600";
+  if (!type) return "text-slate-500 italic";
   const map: Record<string, string> = {
     strategy_session_clicked: "text-amber-400",
     strategy_session: "text-amber-400",
@@ -31,8 +46,8 @@ export function LeadsTable({ leads }: Props) {
   if (leads.length === 0) {
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Leads</p>
-        <h2 className="text-lg font-bold text-white mb-4">Recent submissions</h2>
+        <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">Leads</p>
+        <h2 className="text-lg font-bold text-white mb-4">Recent Leadership Assessments</h2>
         <p className="text-slate-500 text-sm">No leads yet.</p>
       </div>
     );
@@ -40,14 +55,14 @@ export function LeadsTable({ leads }: Props) {
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Leads</p>
+      <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">Leads</p>
       <h2 className="text-lg font-bold text-white mb-4">
-        Recent submissions{" "}
+        Recent Leadership Assessments{" "}
         <span className="text-slate-600 text-sm font-normal">(last 50)</span>
       </h2>
 
       <div className="overflow-x-auto -mx-6 px-6">
-        <table className="w-full text-sm border-collapse min-w-[720px]">
+        <table className="w-full text-sm border-collapse min-w-[760px]">
           <thead>
             <tr className="border-b border-slate-800">
               <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider pb-3 pr-4">
@@ -85,13 +100,16 @@ export function LeadsTable({ leads }: Props) {
                   }
                 </td>
                 <td className="py-3 pr-4">
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold tabular-nums ${scoreBadge(
-                      lead.overall_score
-                    )}`}
-                  >
-                    {lead.overall_score}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold tabular-nums ${scoreBadgeClass(lead.overall_score)}`}
+                    >
+                      {lead.overall_score}
+                    </span>
+                    <span className={`text-xs font-medium ${scoreBandTextClass(lead.overall_score)}`}>
+                      {scoreBandLabel(lead.score_band, lead.overall_score)}
+                    </span>
+                  </div>
                 </td>
                 <td className="py-3 pr-4 text-slate-400 text-xs max-w-[150px]">
                   {lead.lowest_dimension ? dimensionLabel(lead.lowest_dimension) : "—"}

@@ -28,18 +28,14 @@ Deno.serve(async (req: Request) => {
     const [
       { data: assessments },
       { data: actions },
-      { data: commitments },
     ] = await Promise.all([
       supabase
         .from("assessments")
-        .select("id, email, name, overall_score, lowest_dimension, strongest_dimension, completed_at, created_at")
+        .select("id, email, name, overall_score, score_band, lowest_dimension, strongest_dimension, completed_at, created_at")
         .order("created_at", { ascending: false }),
       supabase
         .from("assessment_actions")
         .select("id, assessment_id, action_type, created_at"),
-      supabase
-        .from("assessment_commitments")
-        .select("assessment_id"),
     ]);
 
     const allAssessments = assessments ?? [];
@@ -56,12 +52,37 @@ Deno.serve(async (req: Request) => {
 
     const completionRate = totalStarted > 0 ? Math.round((totalCompleted / totalStarted) * 100) : 0;
     const emailCaptureRate = totalCompleted > 0 ? Math.round((totalEmails / totalCompleted) * 100) : 0;
+    const emailConversionFromStarted = totalStarted > 0 ? Math.min(100, Math.round((totalEmails / totalStarted) * 100)) : 0;
     const conversionRate = totalEmails > 0 ? Math.round((strategyClicks / totalEmails) * 100) : 0;
     const toolkitRate = totalEmails > 0 ? Math.round((toolkitClicks / totalEmails) * 100) : 0;
     const workshopRate = totalEmails > 0 ? Math.round((workshopClicks / totalEmails) * 100) : 0;
     const strategyRate = totalEmails > 0 ? Math.round((strategyClicks / totalEmails) * 100) : 0;
     const bookRate = totalEmails > 0 ? Math.round((bookClicks / totalEmails) * 100) : 0;
     const commitmentRate = totalEmails > 0 ? Math.round((commitmentClicks / totalEmails) * 100) : 0;
+
+    const actionRates: { name: string; rate: number }[] = [
+      { name: "Toolkit", rate: toolkitRate },
+      { name: "Workshop", rate: workshopRate },
+      { name: "Strategy Session", rate: strategyRate },
+      { name: "Book", rate: bookRate },
+    ];
+    const topActionEntry = actionRates.sort((a, b) => b.rate - a.rate)[0];
+    const topAction = topActionEntry && topActionEntry.rate > 0 ? topActionEntry.name : null;
+    const topActionRate = topActionEntry ? topActionEntry.rate : 0;
+
+    const completedWithScores = allAssessments.filter((a) => a.completed_at !== null && typeof a.overall_score === "number");
+    const avgScore = completedWithScores.length > 0
+      ? Math.round(completedWithScores.reduce((sum, a) => sum + a.overall_score, 0) / completedWithScores.length)
+      : 0;
+    const pctLow = completedWithScores.length > 0
+      ? Math.round((completedWithScores.filter((a) => a.overall_score < 50).length / completedWithScores.length) * 100)
+      : 0;
+    const pctMid = completedWithScores.length > 0
+      ? Math.round((completedWithScores.filter((a) => a.overall_score >= 50 && a.overall_score <= 70).length / completedWithScores.length) * 100)
+      : 0;
+    const pctHigh = completedWithScores.length > 0
+      ? Math.round((completedWithScores.filter((a) => a.overall_score > 70).length / completedWithScores.length) * 100)
+      : 0;
 
     const dimensionKeys = [
       "communicate_with_empathy",
@@ -111,6 +132,7 @@ Deno.serve(async (req: Request) => {
       email: a.email,
       name: a.name ?? null,
       overall_score: a.overall_score,
+      score_band: a.score_band ?? null,
       lowest_dimension: a.lowest_dimension,
       strongest_dimension: a.strongest_dimension,
       last_action: actionsByAssessment[a.id]?.type ?? null,
@@ -128,6 +150,13 @@ Deno.serve(async (req: Request) => {
         completionRate,
         emailCaptureRate,
         conversionRate,
+        emailConversionFromStarted,
+      },
+      summary: {
+        avgScore,
+        pctLow,
+        pctMid,
+        pctHigh,
       },
       dimensions: {
         averages: dimensionAverages,
@@ -144,6 +173,8 @@ Deno.serve(async (req: Request) => {
         strategyClicks,
         bookClicks,
         commitmentClicks,
+        topAction,
+        topActionRate,
       },
       leads,
     });

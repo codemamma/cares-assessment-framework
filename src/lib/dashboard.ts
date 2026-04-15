@@ -31,7 +31,7 @@ export function dimensionLabel(key: string): string {
 }
 
 export function actionLabel(type: string | null): string {
-  if (!type) return "—";
+  if (!type) return "No Action Yet";
   const map: Record<string, string> = {
     strategy_session_clicked: "Strategy Session",
     strategy_session: "Strategy Session",

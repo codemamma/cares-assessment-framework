@@ -12,6 +12,12 @@ interface ActionRowProps {
   barColor: string;
 }
 
+function actionIntent(name: string): string {
+  if (name === "Strategy Session") return "coaching";
+  if (name === "Workshop") return "workshop";
+  return "self-serve";
+}
+
 function ActionRow({ label, clicks, rate, color, barColor }: ActionRowProps) {
   return (
     <div className="flex items-center gap-4">
@@ -33,11 +39,19 @@ function ActionRow({ label, clicks, rate, color, barColor }: ActionRowProps) {
 export function ActionInsights({ actions }: Props) {
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+      <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">
         Action Insights
       </p>
-      <h2 className="text-lg font-bold text-white mb-2">What users do after results</h2>
-      <p className="text-sm text-slate-500 mb-6">Percentages are of email-captured users</p>
+      <h2 className="text-lg font-bold text-white mb-1">What users do after results</h2>
+      <p className="text-xs text-slate-500 mb-6">
+        {actions.topAction ? (
+          <>
+            Insight: <span className="text-slate-300 font-medium">{actions.topAction}</span> is the most selected next step{" "}
+            <span className="text-violet-400 font-semibold">({actions.topActionRate}%)</span>, indicating strong intent for{" "}
+            <span className="text-slate-400 font-medium">{actionIntent(actions.topAction)}</span>.
+          </>
+        ) : "Insight: No action data yet."}
+      </p>
 
       <div className="flex flex-col gap-5">
         <ActionRow

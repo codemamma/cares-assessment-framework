@@ -35,7 +35,7 @@ function FunnelStep({ label, count, pct, pctLabel, color, barColor, maxCount }: 
         </span>
       </div>
       {pct !== null && pctLabel && (
-        <div className="w-32 shrink-0">
+        <div className="w-40 shrink-0">
           <span className="text-xs text-slate-500">{pctLabel}: </span>
           <span className="text-xs font-semibold text-slate-300">{pct}%</span>
         </div>
@@ -46,13 +46,18 @@ function FunnelStep({ label, count, pct, pctLabel, color, barColor, maxCount }: 
 
 export function ConversionFunnel({ kpis, funnel }: Props) {
   const maxCount = kpis.totalStarted;
+  const engagementLabel = funnel.completionRate >= 60 ? "high" : "moderate";
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+      <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">
         Conversion Funnel
       </p>
-      <h2 className="text-lg font-bold text-white mb-6">From start to action</h2>
+      <h2 className="text-lg font-bold text-white mb-1">From start to action</h2>
+      <p className="text-xs text-slate-500 mb-6">
+        Insight: <span className="text-violet-400 font-semibold">{funnel.completionRate}%</span> of users complete the assessment, indicating{" "}
+        <span className="text-slate-400 font-medium">{engagementLabel}</span> engagement.
+      </p>
 
       <div className="flex flex-col gap-5">
         <FunnelStep
@@ -76,8 +81,8 @@ export function ConversionFunnel({ kpis, funnel }: Props) {
         <FunnelStep
           label="Email Captured"
           count={kpis.totalEmails}
-          pct={funnel.emailCaptureRate}
-          pctLabel="Of completed"
+          pct={funnel.emailConversionFromStarted}
+          pctLabel="Conversion from started"
           color="text-blue-400"
           barColor="bg-blue-500"
           maxCount={maxCount}
