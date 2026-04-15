@@ -335,69 +335,34 @@ Deno.serve(async (req: Request) => {
         return json({ error: "Valid email is required" }, 400);
       }
 
-      const { data: existing } = await supabase
+      const { data: inserted, error: insertError } = await supabase
         .from("assessments")
+        .insert({
+          id: crypto.randomUUID(),
+          email,
+          role: role ?? "",
+          name: name || null,
+          overall_score: overall_score ?? 0,
+          raw_score: raw_score ?? 0,
+          score_band: score_band ?? "",
+          lowest_dimension: lowest_dimension ?? "",
+          strongest_dimension: strongest_dimension ?? "",
+          roadmap_steps: roadmap_steps ?? [],
+          recommended_chapters: recommended_chapters ?? [],
+          report_sent: false,
+          completed_at: new Date().toISOString(),
+        })
         .select("id")
-        .eq("email", email)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .single();
 
-      let newAssessment: { id: string } | null = null;
-
-      if (existing) {
-        await supabase
-          .from("assessments")
-          .update({
-            role: role ?? "",
-            name: name || null,
-            overall_score: overall_score ?? 0,
-            raw_score: raw_score ?? 0,
-            score_band: score_band ?? "",
-            lowest_dimension: lowest_dimension ?? "",
-            strongest_dimension: strongest_dimension ?? "",
-            roadmap_steps: roadmap_steps ?? [],
-            recommended_chapters: recommended_chapters ?? [],
-            report_sent: false,
-            completed_at: new Date().toISOString(),
-          })
-          .eq("id", existing.id);
-        newAssessment = existing;
-      } else {
-        const { data: inserted, error: insertError } = await supabase
-          .from("assessments")
-          .insert({
-            email,
-            role: role ?? "",
-            name: name || null,
-            overall_score: overall_score ?? 0,
-            raw_score: raw_score ?? 0,
-            score_band: score_band ?? "",
-            lowest_dimension: lowest_dimension ?? "",
-            strongest_dimension: strongest_dimension ?? "",
-            roadmap_steps: roadmap_steps ?? [],
-            recommended_chapters: recommended_chapters ?? [],
-            report_sent: false,
-            completed_at: new Date().toISOString(),
-          })
-          .select("id")
-          .single();
-
-        if (insertError || !inserted) {
-          console.error("Insert error:", insertError);
-          return json({ error: "Failed to save assessment" }, 500);
-        }
-        newAssessment = inserted;
+      if (insertError || !inserted) {
+        console.error("Insert error:", insertError);
+        return json({ error: "Failed to save assessment" }, 500);
       }
 
-      assessmentId = newAssessment.id;
+      assessmentId = inserted.id;
 
       if (Array.isArray(incomingScores) && incomingScores.length > 0) {
-        await supabase
-          .from("assessment_category_scores")
-          .delete()
-          .eq("assessment_id", assessmentId);
-
         await supabase.from("assessment_category_scores").insert(
           incomingScores.map((s: { category_key: string; label: string; raw: number; max: number; percentage: number }) => ({
             assessment_id: assessmentId,
