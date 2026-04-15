@@ -37,6 +37,7 @@ export interface DashboardData {
   };
   leads: {
     id: string;
+    assessment_id: string | null;
     email: string;
     name: string | null;
     overall_score: number;

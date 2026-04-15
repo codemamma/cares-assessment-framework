@@ -5,6 +5,42 @@ interface Props {
   leads: DashboardData["leads"];
 }
 
+interface GroupedLead extends DashboardData["leads"][number] {
+  actions: string[];
+  primaryAction: string | null;
+}
+
+const PRIORITY_ORDER = [
+  "strategy session",
+  "org assessment interest",
+  "toolkit interest",
+  "book order",
+];
+
+function groupLeads(leads: DashboardData["leads"]): GroupedLead[] {
+  const grouped = leads.reduce<Record<string, GroupedLead>>((acc, item) => {
+    const key = item.assessment_id || `${item.email}-${item.created_at}`;
+    if (!acc[key]) {
+      acc[key] = { ...item, actions: [] };
+    }
+    if (item.last_action && item.last_action !== "No Action Yet") {
+      acc[key].actions.push(item.last_action);
+    }
+    return acc;
+  }, {});
+
+  return Object.values(grouped).map((item) => {
+    const uniqueActions = [...new Set(item.actions)];
+    const primaryAction =
+      PRIORITY_ORDER.find((priority) =>
+        uniqueActions.some((action) =>
+          action.toLowerCase().includes(priority)
+        )
+      ) || uniqueActions[0] || null;
+    return { ...item, actions: uniqueActions, primaryAction };
+  });
+}
+
 function scoreBadgeClass(score: number) {
   if (score >= 75) return "bg-green-900/50 text-green-300 border border-green-800/60";
   if (score >= 55) return "bg-blue-900/50 text-blue-300 border border-blue-800/60";
@@ -43,10 +79,12 @@ function actionBadge(type: string | null) {
 }
 
 export function LeadsTable({ leads }: Props) {
-  if (leads.length === 0) {
+  const groupedLeads = groupLeads(leads);
+
+  if (groupedLeads.length === 0) {
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">Leads</p>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Leads</p>
         <h2 className="text-lg font-bold text-white mb-4">Recent Leadership Assessments</h2>
         <p className="text-slate-500 text-sm">No leads yet.</p>
       </div>
@@ -55,10 +93,10 @@ export function LeadsTable({ leads }: Props) {
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-      <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1">Leads</p>
+      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Leads</p>
       <h2 className="text-lg font-bold text-white mb-4">
         Recent Leadership Assessments{" "}
-        <span className="text-slate-600 text-sm font-normal">(last 50)</span>
+        <span className="text-slate-600 text-sm font-normal">({groupedLeads.length})</span>
       </h2>
 
       <div className="overflow-x-auto -mx-6 px-6">
@@ -86,7 +124,7 @@ export function LeadsTable({ leads }: Props) {
             </tr>
           </thead>
           <tbody>
-            {leads.map((lead) => (
+            {groupedLeads.map((lead) => (
               <tr
                 key={lead.id}
                 className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors"
@@ -117,8 +155,13 @@ export function LeadsTable({ leads }: Props) {
                 <td className="py-3 pr-4 text-slate-400 text-xs max-w-[150px]">
                   {lead.strongest_dimension ? dimensionLabel(lead.strongest_dimension) : "—"}
                 </td>
-                <td className={`py-3 pr-4 text-xs font-medium ${actionBadge(lead.last_action)}`}>
-                  {actionLabel(lead.last_action)}
+                <td className={`py-3 pr-4 text-xs font-medium ${actionBadge(lead.primaryAction)}`}>
+                  {lead.primaryAction ? actionLabel(lead.primaryAction) : "No Action Yet"}
+                  {lead.actions.length > 1 && (
+                    <span className="ml-2 text-xs text-gray-400 font-normal">
+                      +{lead.actions.length - 1} more
+                    </span>
+                  )}
                 </td>
                 <td className="py-3 text-slate-500 text-xs tabular-nums whitespace-nowrap">
                   {formatDate(lead.created_at)}
