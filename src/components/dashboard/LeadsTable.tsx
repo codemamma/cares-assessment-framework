@@ -5,7 +5,9 @@ interface Props {
   leads: DashboardData["leads"];
 }
 
-interface GroupedLead extends DashboardData["leads"][number] {
+type LeadRow = DashboardData["leads"][number];
+
+interface GroupedLead extends LeadRow {
   actions: string[];
   primaryAction: string | null;
 }
