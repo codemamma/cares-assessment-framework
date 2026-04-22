@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { loadAssessmentResponses, clearAssessmentResponses, saveEmailCapture, loadEmailCapture } from '@/lib/storage'
 import { calculateResults, generateMockResponses } from '@/lib/scoring'
@@ -34,6 +34,7 @@ export default function ResultsPage() {
   const [role, setRole] = useState<string>('')
   const [name, setName] = useState<string>('')
   const [assessmentId, setAssessmentId] = useState<string | null>(null)
+  const assessmentIdPromiseRef = useRef<Promise<string | null> | null>(null)
 
   useEffect(() => {
     const responses = loadAssessmentResponses()
@@ -61,7 +62,7 @@ export default function ResultsPage() {
       const recs = recommendationsByCategory[lowestKey]
       const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
       const recommendedChapters = getReadingList(lowestKey)
-      submitAssessment({
+      const promise = submitAssessment({
         email: savedEmail.email,
         role: savedEmail.role ?? '',
         name: savedEmail.firstName || null,
@@ -73,7 +74,9 @@ export default function ResultsPage() {
         roadmap_steps: roadmapSteps,
         recommended_chapters: recommendedChapters,
         categoryScores: computed.categoryScores,
-      }).then((id) => { if (id) setAssessmentId(id) })
+      })
+      assessmentIdPromiseRef.current = promise
+      promise.then((id) => { if (id) setAssessmentId(id) })
     }
   }, [navigate])
 
@@ -92,7 +95,7 @@ export default function ResultsPage() {
       const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
       const recommendedChapters = getReadingList(lowestKey)
 
-      const id = await submitAssessment({
+      const promise = submitAssessment({
         email: submittedEmail,
         role: submittedRole,
         name: submittedName || null,
@@ -105,6 +108,8 @@ export default function ResultsPage() {
         recommended_chapters: recommendedChapters,
         categoryScores: results.categoryScores,
       })
+      assessmentIdPromiseRef.current = promise
+      const id = await promise
       if (id) setAssessmentId(id)
     }
   }
@@ -213,7 +218,7 @@ export default function ResultsPage() {
               <h2 className="text-xl font-bold text-white mb-6">
                 Take action on your results
               </h2>
-              <CTASection results={results} email={email} assessmentId={assessmentId} />
+              <CTASection results={results} email={email} assessmentId={assessmentId} assessmentIdPromise={assessmentIdPromiseRef.current} />
             </div>
           </div>
         </>
