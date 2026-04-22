@@ -14,9 +14,7 @@ function json(data: unknown, status = 200) {
   });
 }
 
-const RETAKE_URL =
-  Deno.env.get("RETAKE_URL") ||
-  "https://cares-assessment-framework.vercel.app/assessment";
+const RETAKE_URL = "https://cares-assessment-framework.vercel.app/assessment";
 
 const DIMENSION_LABELS: Record<string, string> = {
   communicate_with_empathy: "Communicate with Empathy",
