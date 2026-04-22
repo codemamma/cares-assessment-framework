@@ -45,10 +45,11 @@ Deno.serve(async (req: Request) => {
     const totalCompleted = allAssessments.filter((a) => a.completed_at !== null).length;
     const totalEmails = allAssessments.filter((a) => a.email && a.email.length > 0).length;
     const strategyClicks = allActions.filter((a) => a.action_type === "strategy_session_clicked" || a.action_type === "strategy_session").length;
-    const toolkitClicks = allActions.filter((a) => a.action_type === "toolkit_clicked" || a.action_type === "toolkit").length;
+    const toolkitClicks = allActions.filter((a) => a.action_type === "toolkit_clicked" || a.action_type === "toolkit" || a.action_type === "toolkit_interest").length;
     const workshopClicks = allActions.filter((a) => a.action_type === "workshop_clicked" || a.action_type === "workshop").length;
     const bookClicks = allActions.filter((a) => a.action_type === "book").length;
     const commitmentClicks = allActions.filter((a) => a.action_type === "commitment").length;
+    const orgAssessmentClicks = allActions.filter((a) => a.action_type === "org_assessment" || a.action_type === "org_assessment_interest").length;
 
     const completionRate = totalStarted > 0 ? Math.round((totalCompleted / totalStarted) * 100) : 0;
     const emailCaptureRate = totalCompleted > 0 ? Math.round((totalEmails / totalCompleted) * 100) : 0;
@@ -59,12 +60,14 @@ Deno.serve(async (req: Request) => {
     const strategyRate = totalEmails > 0 ? Math.round((strategyClicks / totalEmails) * 100) : 0;
     const bookRate = totalEmails > 0 ? Math.round((bookClicks / totalEmails) * 100) : 0;
     const commitmentRate = totalEmails > 0 ? Math.round((commitmentClicks / totalEmails) * 100) : 0;
+    const orgAssessmentRate = totalEmails > 0 ? Math.round((orgAssessmentClicks / totalEmails) * 100) : 0;
 
     const actionRates: { name: string; rate: number }[] = [
       { name: "Toolkit", rate: toolkitRate },
       { name: "Workshop", rate: workshopRate },
       { name: "Strategy Session", rate: strategyRate },
       { name: "Book", rate: bookRate },
+      { name: "Org Assessment", rate: orgAssessmentRate },
     ];
     const topActionEntry = actionRates.sort((a, b) => b.rate - a.rate)[0];
     const topAction = topActionEntry && topActionEntry.rate > 0 ? topActionEntry.name : null;
@@ -115,13 +118,27 @@ Deno.serve(async (req: Request) => {
     }
     const mostCommonWeak = Object.entries(weaknessCounts).sort((a, b) => b[1] - a[1])[0];
 
+    const ACTION_LABEL_MAP: Record<string, string> = {
+      strategy_session_clicked: "strategy_session",
+      strategy_session: "strategy_session",
+      toolkit_clicked: "toolkit",
+      toolkit: "toolkit",
+      toolkit_interest: "toolkit",
+      workshop_clicked: "workshop",
+      workshop: "workshop",
+      book: "book",
+      commitment: "commitment",
+      org_assessment: "org_assessment",
+      org_assessment_interest: "org_assessment",
+    };
+
     const actionsByAssessment: Record<string, { type: string; created_at: string }> = {};
     for (const action of allActions) {
       if (!action.assessment_id) continue;
       const existing = actionsByAssessment[action.assessment_id];
       if (!existing || action.created_at > existing.created_at) {
         actionsByAssessment[action.assessment_id] = {
-          type: action.action_type,
+          type: ACTION_LABEL_MAP[action.action_type] ?? action.action_type,
           created_at: action.created_at,
         };
       }
@@ -168,11 +185,13 @@ Deno.serve(async (req: Request) => {
         strategyRate,
         bookRate,
         commitmentRate,
+        orgAssessmentRate,
         toolkitClicks,
         workshopClicks,
         strategyClicks,
         bookClicks,
         commitmentClicks,
+        orgAssessmentClicks,
         topAction,
         topActionRate,
       },

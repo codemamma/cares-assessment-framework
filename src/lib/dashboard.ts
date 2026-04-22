@@ -37,10 +37,13 @@ export function actionLabel(type: string | null): string {
     strategy_session: "Strategy Session",
     toolkit_clicked: "Toolkit",
     toolkit: "Toolkit",
+    toolkit_interest: "Toolkit",
     workshop_clicked: "Workshop",
     workshop: "Workshop",
     book: "Book",
     commitment: "Commitment Submitted",
+    org_assessment: "Org Assessment",
+    org_assessment_interest: "Org Assessment",
   };
   return map[type] ?? type.replace(/_/g, " ");
 }

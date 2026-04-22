@@ -27,11 +27,13 @@ export interface DashboardData {
     strategyRate: number;
     bookRate: number;
     commitmentRate: number;
+    orgAssessmentRate: number;
     toolkitClicks: number;
     workshopClicks: number;
     strategyClicks: number;
     bookClicks: number;
     commitmentClicks: number;
+    orgAssessmentClicks: number;
     topAction: string | null;
     topActionRate: number;
   };

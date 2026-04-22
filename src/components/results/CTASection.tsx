@@ -35,14 +35,14 @@ export function CTASection({ assessmentId, email }: CTASectionProps) {
 
   async function handleToolkit() {
     if (assessmentId) {
-      await trackAction(assessmentId, "toolkit_interest");
+      await trackAction(assessmentId, "toolkit");
     }
     showToast("Toolkit launching soon. Get early access.");
   }
 
   async function handleOrgAssessment() {
     if (assessmentId) {
-      await trackAction(assessmentId, "org_assessment_interest");
+      await trackAction(assessmentId, "org_assessment");
     }
     showToast("Organizational assessment launching soon. Join the waitlist.");
   }

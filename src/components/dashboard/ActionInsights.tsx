@@ -15,6 +15,7 @@ interface ActionRowProps {
 function actionIntent(name: string): string {
   if (name === "Strategy Session") return "coaching";
   if (name === "Workshop") return "workshop";
+  if (name === "Org Assessment") return "enterprise";
   return "self-serve";
 }
 
@@ -60,6 +61,13 @@ export function ActionInsights({ actions }: Props) {
           rate={actions.toolkitRate}
           color="text-blue-400"
           barColor="bg-blue-500"
+        />
+        <ActionRow
+          label="Org Assessment"
+          clicks={actions.orgAssessmentClicks}
+          rate={actions.orgAssessmentRate}
+          color="text-rose-400"
+          barColor="bg-rose-500"
         />
         <ActionRow
           label="Workshop"
