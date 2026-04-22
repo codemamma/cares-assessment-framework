@@ -184,12 +184,12 @@ export default function ResultsPage() {
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                  Suggested Reading
-                </p>
                 <h2 className="text-xl font-bold text-white mb-2">
                   Recommended Reading from the CARES Framework
                 </h2>
+                <p className="text-sm text-slate-400 mb-6">
+                  Based on your assessment, here's where to start.
+                </p>
                 <SuggestedReading lowestCategory={results.lowestCategory.key} />
               </div>
             </div>

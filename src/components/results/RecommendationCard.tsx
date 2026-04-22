@@ -1,5 +1,5 @@
 import { CareCategoryKey } from "@/types/assessment";
-import { recommendationsByCategory, chapterMap, supportingChapters } from "@/data/recommendations";
+import { recommendationsByCategory, chapterMap } from "@/data/recommendations";
 
 interface RoadmapStepsProps {
   lowestCategory: CareCategoryKey;
@@ -27,16 +27,49 @@ interface SuggestedReadingProps {
   lowestCategory: CareCategoryKey;
 }
 
-function getReadingList(lowestCategory: CareCategoryKey): { title: string; isPrimary: boolean }[] {
+type ReadingTag = "Start Here" | "Apply & Strengthen" | "Apply at Scale";
+
+interface ReadingEntry {
+  title: string;
+  tag: ReadingTag;
+  subtext: string;
+}
+
+function getReadingList(lowestCategory: CareCategoryKey): ReadingEntry[] {
   const primary = chapterMap[lowestCategory];
-  const always = "CARES in Action";
-  const other = supportingChapters.filter((c) => c !== always)[0];
   return [
-    { title: primary.title, isPrimary: true },
-    { title: always, isPrimary: false },
-    { title: other, isPrimary: false },
+    {
+      title: primary.title,
+      tag: "Start Here",
+      subtext: "Start with this chapter to strengthen your key development area.",
+    },
+    {
+      title: "CARES in Action",
+      tag: "Apply & Strengthen",
+      subtext: "This chapter is for practical application to strengthen your overall CARES leadership.",
+    },
+    {
+      title: "Applying CARES to Your Organization",
+      tag: "Apply at Scale",
+      subtext: "Extend principles from this chapter across your team or organization.",
+    },
   ];
 }
+
+const tagStyles: Record<ReadingTag, { card: string; badge: string }> = {
+  "Start Here": {
+    card: "bg-sky-950/40 border-sky-700/50",
+    badge: "bg-sky-500/20 border border-sky-500/40 text-sky-300",
+  },
+  "Apply & Strengthen": {
+    card: "bg-slate-800 border-slate-700",
+    badge: "bg-slate-700 border border-slate-600 text-slate-400",
+  },
+  "Apply at Scale": {
+    card: "bg-slate-800 border-slate-700",
+    badge: "bg-slate-700 border border-slate-600 text-slate-400",
+  },
+};
 
 export function SuggestedReading({ lowestCategory }: SuggestedReadingProps) {
   const primary = chapterMap[lowestCategory];
@@ -46,46 +79,35 @@ export function SuggestedReading({ lowestCategory }: SuggestedReadingProps) {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-slate-500 mb-4">
-        Based on your assessment, we recommend starting here
-      </p>
-
-      {chapters.map((chapter, i) => (
-        <div
-          key={i}
-          className={`rounded-2xl p-5 border flex items-start gap-4 ${
-            chapter.isPrimary
-              ? "bg-sky-950/40 border-sky-700/50"
-              : "bg-slate-800 border-slate-700"
-          }`}
-        >
-          <div className="flex-shrink-0 mt-0.5">
-            <span
-              className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${
-                chapter.isPrimary
-                  ? "bg-sky-500/20 border border-sky-500/40 text-sky-300"
-                  : "bg-slate-700 border border-slate-600 text-slate-400"
-              }`}
-            >
-              {chapter.isPrimary ? "Focus Area" : "Apply & Strengthen"}
-            </span>
+      {chapters.map((chapter, i) => {
+        const styles = tagStyles[chapter.tag];
+        return (
+          <div
+            key={i}
+            className={`rounded-2xl p-5 border flex items-start gap-4 ${styles.card}`}
+          >
+            <div className="flex-shrink-0 mt-0.5">
+              <span
+                className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${styles.badge}`}
+              >
+                {chapter.tag}
+              </span>
+            </div>
+            <div className="flex-1">
+              <p
+                className={`font-semibold text-sm leading-snug ${
+                  chapter.tag === "Start Here" ? "text-white" : "text-slate-200"
+                }`}
+              >
+                {chapter.title}
+              </p>
+              <p className="text-slate-400 text-xs mt-1.5 leading-relaxed">
+                {chapter.subtext}
+              </p>
+            </div>
           </div>
-          <div className="flex-1">
-            <p
-              className={`font-semibold text-sm leading-snug ${
-                chapter.isPrimary ? "text-white" : "text-slate-200"
-              }`}
-            >
-              {chapter.title}
-            </p>
-            <p className="text-slate-400 text-xs mt-1.5 leading-relaxed">
-              {chapter.isPrimary
-                ? "This chapter directly addresses your key development area."
-                : "Practical application to strengthen your overall CARES leadership."}
-            </p>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

@@ -82,22 +82,33 @@ function buildEmailHtml(params: {
     )
     .join("");
 
+  const chapterTags = ["Start Here", "Apply &amp; Strengthen", "Apply at Scale"];
+  const chapterSubtexts = [
+    "Start with this chapter to strengthen your key development area.",
+    "This chapter is for practical application to strengthen your overall CARES leadership.",
+    "Extend principles from this chapter across your team or organization.",
+  ];
   const chapterRows = recommended_chapters
     .map(
-      (ch) => `
-      <div style="background:${ch.isPrimary ? "#0c1e35" : "#1e293b"};border:1px solid ${ch.isPrimary ? "#1d4ed844" : "#334155"};border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+      (ch, i) => {
+        const isFirst = i === 0;
+        const tag = chapterTags[i] ?? chapterTags[chapterTags.length - 1];
+        const subtext = chapterSubtexts[i] ?? chapterSubtexts[chapterSubtexts.length - 1];
+        return `
+      <div style="background:${isFirst ? "#0c1e35" : "#1e293b"};border:1px solid ${isFirst ? "#1d4ed844" : "#334155"};border-radius:10px;padding:14px 16px;margin-bottom:10px;">
         <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
           <tr>
             <td style="vertical-align:top;padding-right:16px;width:1%;white-space:nowrap;">
-              <span style="display:inline-block;background:${ch.isPrimary ? "#0ea5e920" : "#334155"};border:1px solid ${ch.isPrimary ? "#0ea5e940" : "#475569"};color:${ch.isPrimary ? "#7dd3fc" : "#94a3b8"};font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;">${ch.isPrimary ? "Focus Area" : "Apply &amp; Strengthen"}</span>
+              <span style="display:inline-block;background:${isFirst ? "#0ea5e920" : "#334155"};border:1px solid ${isFirst ? "#0ea5e940" : "#475569"};color:${isFirst ? "#7dd3fc" : "#94a3b8"};font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;">${tag}</span>
             </td>
             <td style="vertical-align:top;">
               <p style="margin:0 0 4px;color:#f1f5f9;font-size:13px;font-weight:600;">${ch.title}</p>
-              <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.5;">${ch.isPrimary ? "This chapter directly addresses your key development area." : "Practical application to strengthen your overall CARES leadership."}</p>
+              <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.5;">${subtext}</p>
             </td>
           </tr>
         </table>
-      </div>`
+      </div>`;
+      }
     )
     .join("");
 
@@ -203,11 +214,11 @@ function buildEmailHtml(params: {
             </td>
           </tr>
 
-          <!-- Suggested Reading -->
+          <!-- Recommended Reading -->
           <tr>
             <td style="padding-bottom:24px;">
-              <p style="margin:0 0 4px;color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">Suggested Reading</p>
-              <h2 style="margin:0 0 16px;color:#f1f5f9;font-size:16px;font-weight:700;">Go deeper</h2>
+              <h2 style="margin:0 0 4px;color:#f1f5f9;font-size:16px;font-weight:700;">Recommended Reading from the CARES Framework</h2>
+              <p style="margin:0 0 16px;color:#94a3b8;font-size:13px;">Based on your assessment, here's where to start.</p>
               ${chapterRows}
             </td>
           </tr>
