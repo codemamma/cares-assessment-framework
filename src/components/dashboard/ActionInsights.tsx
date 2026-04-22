@@ -70,13 +70,6 @@ export function ActionInsights({ actions }: Props) {
           barColor="bg-rose-500"
         />
         <ActionRow
-          label="Workshop"
-          clicks={actions.workshopClicks}
-          rate={actions.workshopRate}
-          color="text-green-400"
-          barColor="bg-green-500"
-        />
-        <ActionRow
           label="Strategy Session"
           clicks={actions.strategyClicks}
           rate={actions.strategyRate}
