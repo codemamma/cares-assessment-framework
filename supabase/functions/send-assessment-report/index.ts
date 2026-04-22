@@ -14,6 +14,10 @@ function json(data: unknown, status = 200) {
   });
 }
 
+const RETAKE_URL =
+  Deno.env.get("RETAKE_URL") ||
+  "https://cares-assessment-framework.vercel.app/assessment";
+
 const DIMENSION_LABELS: Record<string, string> = {
   communicate_with_empathy: "Communicate with Empathy",
   adapt_with_agility: "Adapt with Agility",
@@ -245,6 +249,20 @@ function buildEmailHtml(params: {
               <p style="margin:0 0 20px;color:#94a3b8;font-size:13px;">Explore the full CARES framework and build lasting leadership habits</p>
               <a href="${supabaseUrl}/functions/v1/track-action-and-redirect?assessmentId=${assessmentId}&actionType=book" style="display:inline-block;background:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
                 Get the Book on Amazon
+              </a>
+            </td>
+          </tr>
+
+          <tr><td style="height:16px;"></td></tr>
+
+          <!-- Retake Assessment -->
+          <tr>
+            <td style="background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:28px;text-align:center;">
+              <p style="margin:0 0 4px;color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">Track Your Growth</p>
+              <h2 style="margin:0 0 8px;color:#f1f5f9;font-size:18px;font-weight:800;">Measure Your Progress</h2>
+              <p style="margin:0 0 20px;color:#94a3b8;font-size:13px;">Retake this assessment after 30 days to see how your leadership has grown.</p>
+              <a href="${RETAKE_URL}" style="display:inline-block;background:#0ea5e9;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
+                Retake Assessment
               </a>
             </td>
           </tr>
