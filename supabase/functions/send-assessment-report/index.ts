@@ -221,7 +221,7 @@ function buildEmailHtml(params: {
               <h2 style="margin:0 0 8px;color:#f1f5f9;font-size:18px;font-weight:800;">1:1 Session with Saby Waraich</h2>
               <p style="margin:0 0 20px;color:#94a3b8;font-size:13px;">Book a free 15-minute session with Saby Waraich.</p>
               <a href="https://calendly.com/waraich-saby/30min?source=cares_assessment_email&email=${encodeURIComponent(params.email)}" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
-                Book a Free Strategy Session
+                Book Free Session
               </a>
             </td>
           </tr>
