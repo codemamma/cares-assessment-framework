@@ -10,6 +10,15 @@ const corsHeaders = {
 const AMAZON_BOOK_URL =
   "https://www.amazon.com/dp/1964644593?ref=cm_sw_r_ffobk_cp_ud_dp_JPQ78VTAXV96F7JPM3PA&ref_=cm_sw_r_ffobk_cp_ud_dp_JPQ78VTAXV96F7JPM3PA&social_share=cm_sw_r_ffobk_cp_ud_dp_JPQ78VTAXV96F7JPM3PA&bestFormat=true";
 
+const CALENDLY_BASE_URL = "https://calendly.com/waraich-saby/30min";
+
+const REDIRECT_MAP: Record<string, string> = {
+  book: AMAZON_BOOK_URL,
+  strategy_session: CALENDLY_BASE_URL,
+};
+
+const ALLOWED_ACTIONS = new Set(Object.keys(REDIRECT_MAP));
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -27,7 +36,7 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    if (actionType !== "book") {
+    if (!ALLOWED_ACTIONS.has(actionType)) {
       return new Response(JSON.stringify({ error: "Invalid actionType" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -41,14 +50,21 @@ Deno.serve(async (req: Request) => {
 
     await supabase.from("assessment_actions").insert({
       assessment_id: assessmentId,
-      action_type: "book",
+      action_type: actionType,
     });
+
+    let redirectUrl = REDIRECT_MAP[actionType];
+
+    if (actionType === "strategy_session") {
+      const email = url.searchParams.get("email") ?? "";
+      redirectUrl = `${CALENDLY_BASE_URL}?source=cares_assessment_email&email=${encodeURIComponent(email)}`;
+    }
 
     return new Response(null, {
       status: 302,
       headers: {
         ...corsHeaders,
-        Location: AMAZON_BOOK_URL,
+        Location: redirectUrl,
       },
     });
   } catch (err) {
