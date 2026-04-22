@@ -62,10 +62,10 @@ export function CTASection({ assessmentId, email }: CTASectionProps) {
               Recommended
             </p>
             <h3 className="text-white font-bold text-lg mb-1">
-              1:1 Strategy Session
+              1:1 Session with Saby Waraich
             </h3>
             <p className="text-slate-400 text-sm">
-              Book a free 15-minute strategy session with Saby Waraich.
+              Book a free 15-minute session with Saby Waraich.
             </p>
           </div>
           <button
