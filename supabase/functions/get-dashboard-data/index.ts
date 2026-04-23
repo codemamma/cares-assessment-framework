@@ -51,16 +51,36 @@ Deno.serve(async (req: Request) => {
     const commitmentClicks = allActions.filter((a) => a.action_type === "commitment").length;
     const orgAssessmentClicks = allActions.filter((a) => a.action_type === "org_assessment" || a.action_type === "org_assessment_interest").length;
 
+    function distinctUsers(types: string[]): number {
+      const ids = new Set<string>();
+      for (const a of allActions) {
+        if (types.includes(a.action_type) && a.assessment_id) {
+          ids.add(a.assessment_id);
+        }
+      }
+      return ids.size;
+    }
+
+    const totalUsers = allAssessments.length;
+    const strategyUsers = distinctUsers(["strategy_session_clicked", "strategy_session"]);
+    const toolkitUsers = distinctUsers(["toolkit_clicked", "toolkit", "toolkit_interest"]);
+    const workshopUsers = distinctUsers(["workshop_clicked", "workshop"]);
+    const bookUsers = distinctUsers(["book"]);
+    const commitmentUsers = distinctUsers(["commitment"]);
+    const orgAssessmentUsers = distinctUsers(["org_assessment", "org_assessment_interest"]);
+
+    const pctOf = (n: number) => totalUsers > 0 ? Math.round((n / totalUsers) * 1000) / 10 : 0;
+
     const completionRate = totalStarted > 0 ? Math.round((totalCompleted / totalStarted) * 100) : 0;
     const emailCaptureRate = totalCompleted > 0 ? Math.round((totalEmails / totalCompleted) * 100) : 0;
     const emailConversionFromStarted = totalStarted > 0 ? Math.min(100, Math.round((totalEmails / totalStarted) * 100)) : 0;
     const conversionRate = totalEmails > 0 ? Math.round((strategyClicks / totalEmails) * 100) : 0;
-    const toolkitRate = totalEmails > 0 ? Math.round((toolkitClicks / totalEmails) * 100) : 0;
-    const workshopRate = totalEmails > 0 ? Math.round((workshopClicks / totalEmails) * 100) : 0;
-    const strategyRate = totalEmails > 0 ? Math.round((strategyClicks / totalEmails) * 100) : 0;
-    const bookRate = totalEmails > 0 ? Math.round((bookClicks / totalEmails) * 100) : 0;
-    const commitmentRate = totalEmails > 0 ? Math.round((commitmentClicks / totalEmails) * 100) : 0;
-    const orgAssessmentRate = totalEmails > 0 ? Math.round((orgAssessmentClicks / totalEmails) * 100) : 0;
+    const toolkitRate = pctOf(toolkitUsers);
+    const workshopRate = pctOf(workshopUsers);
+    const strategyRate = pctOf(strategyUsers);
+    const bookRate = pctOf(bookUsers);
+    const commitmentRate = pctOf(commitmentUsers);
+    const orgAssessmentRate = pctOf(orgAssessmentUsers);
 
     const actionRates: { name: string; rate: number }[] = [
       { name: "Toolkit", rate: toolkitRate },

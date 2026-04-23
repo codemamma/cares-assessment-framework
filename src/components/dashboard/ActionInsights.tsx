@@ -31,7 +31,7 @@ function ActionRow({ label, clicks, rate, color, barColor }: ActionRowProps) {
           style={{ width: `${rate}%` }}
         />
       </div>
-      <span className={`text-sm font-bold tabular-nums w-10 text-right ${color}`}>{rate}%</span>
+      <span className={`text-sm font-bold tabular-nums w-24 text-right ${color}`}>{rate}% <span className="font-normal text-slate-500 text-xs">of users</span></span>
       <span className="text-xs text-slate-600 w-16 text-right tabular-nums">{clicks} clicks</span>
     </div>
   );
@@ -48,7 +48,7 @@ export function ActionInsights({ actions }: Props) {
         {actions.topAction ? (
           <>
             Insight: <span className="text-slate-300 font-medium">{actions.topAction}</span> is the most selected next step{" "}
-            <span className="text-violet-400 font-semibold">({actions.topActionRate}%)</span>, indicating strong intent for{" "}
+            <span className="text-violet-400 font-semibold">({actions.topActionRate}% of users)</span>, indicating strong interest in{" "}
             <span className="text-slate-400 font-medium">{actionIntent(actions.topAction)}</span>.
           </>
         ) : "Insight: No action data yet."}
