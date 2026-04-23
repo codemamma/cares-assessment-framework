@@ -1,8 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { loadAssessmentResponses, clearAssessmentResponses, saveEmailCapture, loadEmailCapture } from '@/lib/storage'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import {
+  loadAssessmentResponses,
+  clearAssessmentResponses,
+  saveEmailCapture,
+  loadEmailCapture,
+  saveAssessmentId,
+  loadAssessmentId,
+} from '@/lib/storage'
 import { calculateResults, generateMockResponses } from '@/lib/scoring'
-import { AssessmentResults } from '@/types/assessment'
+import { AssessmentResults, CareCategoryKey } from '@/types/assessment'
 import { ScoreHero } from '@/components/results/ScoreHero'
 import { CategoryBreakdown } from '@/components/results/CategoryBreakdown'
 import { InsightCard } from '@/components/results/InsightCard'
@@ -11,8 +18,9 @@ import { RoadmapSteps, SuggestedReading } from '@/components/results/Recommendat
 import { CommitmentToGrowth } from '@/components/results/CommitmentToGrowth'
 import { CTASection } from '@/components/results/CTASection'
 import { recommendationsByCategory, chapterMap, supportingChapters } from '@/data/recommendations'
-import { submitAssessment } from '@/lib/api'
-import { CareCategoryKey } from '@/types/assessment'
+import { assessmentCategories } from '@/data/caresQuestions'
+import { submitAssessment, fetchAssessment, FetchAssessmentResult } from '@/lib/api'
+import { getScoreBand } from '@/lib/scoring'
 
 function getReadingList(lowestCategory: CareCategoryKey) {
   const primary = chapterMap[lowestCategory]
@@ -25,69 +33,96 @@ function getReadingList(lowestCategory: CareCategoryKey) {
   ]
 }
 
+const shortLabelMap = Object.fromEntries(
+  assessmentCategories.map((c) => [c.key, c.shortLabel])
+)
+
+function hydrateResultsFromDb(data: FetchAssessmentResult): AssessmentResults {
+  const categoryScores = data.categoryScores.map((s) => ({
+    key: s.category_key,
+    label: s.label,
+    shortLabel: shortLabelMap[s.category_key] ?? s.label,
+    raw: s.raw,
+    max: s.max,
+    percentage: s.percentage,
+  }))
+
+  const sorted = [...categoryScores].sort((a, b) => b.raw - a.raw)
+
+  return {
+    responses: {},
+    categoryScores,
+    rawScore: data.assessment.raw_score,
+    normalizedScore: data.assessment.overall_score,
+    highestCategory: sorted[0],
+    lowestCategory: sorted[sorted.length - 1],
+    scoreBand: getScoreBand(data.assessment.overall_score),
+  }
+}
+
 const DEV_MOCK = import.meta.env.DEV
 
 export default function ResultsPage() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [results, setResults] = useState<AssessmentResults | null>(null)
   const [email, setEmail] = useState<string | null>(null)
-  const [role, setRole] = useState<string>('')
-  const [name, setName] = useState<string>('')
   const [assessmentId, setAssessmentId] = useState<string | null>(null)
-  const assessmentIdPromiseRef = useRef<Promise<string | null> | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const responses = loadAssessmentResponses()
-    const hasResponses = Object.keys(responses).length === 25
+    let cancelled = false
 
-    let computed: AssessmentResults | null = null
+    async function init() {
+      const idFromUrl = searchParams.get('id')
+      const idFromStorage = loadAssessmentId()
+      const existingId = idFromUrl || idFromStorage
 
-    if (!hasResponses && DEV_MOCK) {
-      computed = calculateResults(generateMockResponses())
-      setResults(computed)
-    } else if (!hasResponses) {
-      navigate('/assessment')
-      return
-    } else {
-      computed = calculateResults(responses)
-      setResults(computed)
+      if (existingId) {
+        const fetched = await fetchAssessment(existingId)
+        if (cancelled) return
+        if (fetched) {
+          const hydrated = hydrateResultsFromDb(fetched)
+          setResults(hydrated)
+          setEmail(fetched.assessment.email)
+          setAssessmentId(existingId)
+          saveAssessmentId(existingId)
+          if (!idFromUrl) {
+            setSearchParams({ id: existingId }, { replace: true })
+          }
+          setLoading(false)
+          return
+        }
+      }
+
+      const responses = loadAssessmentResponses()
+      const hasResponses = Object.keys(responses).length === 25
+
+      if (!hasResponses && DEV_MOCK) {
+        setResults(calculateResults(generateMockResponses()))
+      } else if (!hasResponses) {
+        navigate('/assessment')
+        return
+      } else {
+        setResults(calculateResults(responses))
+      }
+
+      const savedEmail = loadEmailCapture()
+      if (savedEmail?.email) {
+        setEmail(savedEmail.email)
+      }
+
+      setLoading(false)
     }
 
-    const savedEmail = loadEmailCapture()
-    if (savedEmail?.email && computed) {
-      setEmail(savedEmail.email)
-      setRole(savedEmail.role ?? '')
-      setName(savedEmail.firstName ?? '')
-      const lowestKey = computed.lowestCategory.key
-      const recs = recommendationsByCategory[lowestKey]
-      const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
-      const recommendedChapters = getReadingList(lowestKey)
-      const promise = submitAssessment({
-        email: savedEmail.email,
-        role: savedEmail.role ?? '',
-        name: savedEmail.firstName || null,
-        overall_score: computed.normalizedScore,
-        raw_score: computed.rawScore,
-        score_band: computed.scoreBand.label,
-        lowest_dimension: lowestKey,
-        strongest_dimension: computed.highestCategory.key,
-        roadmap_steps: roadmapSteps,
-        recommended_chapters: recommendedChapters,
-        categoryScores: computed.categoryScores,
-      })
-      assessmentIdPromiseRef.current = promise
-      promise.then((id) => { if (id) setAssessmentId(id) })
-    }
-  }, [navigate])
+    init()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleEmailUnlock(submittedEmail: string, submittedRole: string, submittedName: string) {
     setEmail(submittedEmail)
-    setRole(submittedRole)
-    setName(submittedName)
     saveEmailCapture({ firstName: submittedName, email: submittedEmail, role: submittedRole, company: '' })
-    setTimeout(() => {
-      document.getElementById('roadmap-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 100)
 
     if (results) {
       const lowestKey = results.lowestCategory.key
@@ -95,7 +130,7 @@ export default function ResultsPage() {
       const roadmapSteps = recs?.recommendations.slice(0, 3) ?? []
       const recommendedChapters = getReadingList(lowestKey)
 
-      const promise = submitAssessment({
+      const id = await submitAssessment({
         email: submittedEmail,
         role: submittedRole,
         name: submittedName || null,
@@ -108,10 +143,17 @@ export default function ResultsPage() {
         recommended_chapters: recommendedChapters,
         categoryScores: results.categoryScores,
       })
-      assessmentIdPromiseRef.current = promise
-      const id = await promise
-      if (id) setAssessmentId(id)
+
+      if (id) {
+        setAssessmentId(id)
+        saveAssessmentId(id)
+        setSearchParams({ id }, { replace: true })
+      }
     }
+
+    setTimeout(() => {
+      document.getElementById('roadmap-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
   }
 
   function handleRetake() {
@@ -119,10 +161,10 @@ export default function ResultsPage() {
     navigate('/assessment')
   }
 
-  if (!results) {
+  if (loading || !results) {
     return (
       <div className="min-h-screen bg-[#07111f] flex items-center justify-center">
-        <div className="text-slate-400 text-lg">Calculating your results...</div>
+        <div className="text-slate-400 text-lg">Loading your results...</div>
       </div>
     )
   }
@@ -218,7 +260,7 @@ export default function ResultsPage() {
               <h2 className="text-xl font-bold text-white mb-6">
                 Take action on your results
               </h2>
-              <CTASection results={results} email={email} assessmentId={assessmentId} assessmentIdPromise={assessmentIdPromiseRef.current} />
+              <CTASection results={results} email={email} assessmentId={assessmentId} />
             </div>
           </div>
         </>

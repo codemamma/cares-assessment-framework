@@ -5,6 +5,7 @@ const KEYS = {
   COMMITMENT: "cares_commitment_data",
   EMAIL: "cares_email_capture",
   CURRENT_STEP: "cares_current_step",
+  ASSESSMENT_ID: "cares_assessment_id",
 };
 
 export function saveAssessmentResponses(responses: AssessmentResponses): void {
@@ -28,6 +29,17 @@ export function clearAssessmentResponses(): void {
   localStorage.removeItem(KEYS.CURRENT_STEP);
   localStorage.removeItem(KEYS.EMAIL);
   localStorage.removeItem(KEYS.COMMITMENT);
+  localStorage.removeItem(KEYS.ASSESSMENT_ID);
+}
+
+export function saveAssessmentId(id: string): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(KEYS.ASSESSMENT_ID, id);
+}
+
+export function loadAssessmentId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(KEYS.ASSESSMENT_ID) || null;
 }
 
 export function saveCommitmentData(data: CommitmentData): void {

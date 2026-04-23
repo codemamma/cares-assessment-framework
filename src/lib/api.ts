@@ -1,4 +1,4 @@
-import { CategoryScore } from "@/types/assessment";
+import { CategoryScore, CareCategoryKey } from "@/types/assessment";
 
 interface SubmitAssessmentParams {
   email: string;
@@ -56,6 +56,70 @@ export async function submitAssessment(params: SubmitAssessmentParams): Promise<
     return null;
   } catch (err) {
     console.error("Failed to submit assessment:", err);
+    return null;
+  }
+}
+
+export interface FetchedAssessment {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  overall_score: number;
+  raw_score: number;
+  score_band: string;
+  lowest_dimension: string;
+  strongest_dimension: string;
+  roadmap_steps: string[];
+  recommended_chapters: { title: string; isPrimary: boolean }[];
+  report_sent: boolean;
+  commitment_submitted: boolean;
+  completed_at: string | null;
+  created_at: string;
+}
+
+export interface FetchedCategoryScore {
+  category_key: CareCategoryKey;
+  label: string;
+  raw: number;
+  max: number;
+  percentage: number;
+}
+
+export interface FetchedCommitment {
+  focus_area: string;
+  practice: string;
+  measure: string;
+  support: string;
+}
+
+export interface FetchAssessmentResult {
+  assessment: FetchedAssessment;
+  categoryScores: FetchedCategoryScore[];
+  commitment: FetchedCommitment | null;
+}
+
+export async function fetchAssessment(assessmentId: string): Promise<FetchAssessmentResult | null> {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  try {
+    const res = await fetch(`${supabaseUrl}/functions/v1/fetch-assessment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseAnonKey}`,
+        "Apikey": supabaseAnonKey,
+      },
+      body: JSON.stringify({ assessmentId }),
+    });
+
+    if (res.ok) {
+      return await res.json();
+    }
+    return null;
+  } catch (err) {
+    console.error("Failed to fetch assessment:", err);
     return null;
   }
 }

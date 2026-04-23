@@ -362,6 +362,20 @@ Deno.serve(async (req: Request) => {
         return json({ error: "Valid email is required" }, 400);
       }
 
+      const cutoff = new Date(Date.now() - 60 * 1000).toISOString();
+      const { data: recent } = await supabase
+        .from("assessments")
+        .select("id")
+        .eq("email", email)
+        .eq("raw_score", raw_score ?? 0)
+        .gte("created_at", cutoff)
+        .limit(1)
+        .maybeSingle();
+
+      if (recent) {
+        return json({ success: true, assessmentId: recent.id, deduplicated: true });
+      }
+
       const { data: inserted, error: insertError } = await supabase
         .from("assessments")
         .insert({

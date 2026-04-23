@@ -6,7 +6,6 @@ interface CTASectionProps {
   results: AssessmentResults;
   email: string;
   assessmentId: string | null;
-  assessmentIdPromise?: Promise<string | null> | null;
 }
 
 type ToastState = {
@@ -16,7 +15,7 @@ type ToastState = {
 
 const CALENDLY_URL = "https://calendly.com/waraich-saby/30min";
 
-export function CTASection({ assessmentId, email, assessmentIdPromise }: CTASectionProps) {
+export function CTASection({ assessmentId, email }: CTASectionProps) {
   const [toast, setToast] = useState<ToastState>({ visible: false, message: "" });
 
   function showToast(message: string) {
@@ -24,16 +23,9 @@ export function CTASection({ assessmentId, email, assessmentIdPromise }: CTASect
     setTimeout(() => setToast({ visible: false, message: "" }), 4000);
   }
 
-  async function resolveAssessmentId(): Promise<string | null> {
-    if (assessmentId) return assessmentId;
-    if (assessmentIdPromise) return assessmentIdPromise;
-    return null;
-  }
-
   async function handleStrategySession() {
-    const id = await resolveAssessmentId();
-    if (id) {
-      await trackAction(id, "strategy_session");
+    if (assessmentId) {
+      await trackAction(assessmentId, "strategy_session");
     }
     const url = new URL(CALENDLY_URL);
     url.searchParams.set("source", "cares_assessment");
@@ -42,17 +34,15 @@ export function CTASection({ assessmentId, email, assessmentIdPromise }: CTASect
   }
 
   async function handleToolkit() {
-    const id = await resolveAssessmentId();
-    if (id) {
-      await trackAction(id, "toolkit");
+    if (assessmentId) {
+      await trackAction(assessmentId, "toolkit");
     }
     showToast("Toolkit launching soon. Get early access.");
   }
 
   async function handleOrgAssessment() {
-    const id = await resolveAssessmentId();
-    if (id) {
-      await trackAction(id, "org_assessment");
+    if (assessmentId) {
+      await trackAction(assessmentId, "org_assessment");
     }
     showToast("Organizational assessment launching soon. Join the waitlist.");
   }
